@@ -12,15 +12,10 @@
     :root {
       --bg-main: #090a10;
       --surface-card: rgba(18, 22, 34, 0.76);
-      --surface-elevated: rgba(26, 32, 48, 0.9);
       --text-main: #f8fafc;
       --text-sub: #94a3b8;
       --text-muted: #64748b;
       --border: rgba(255, 255, 255, 0.08);
-      --accent: #6366f1;
-      --success: #10b981;
-      --warn: #f59e0b;
-      --danger: #f43f5e;
       --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
       --mono: "JetBrains Mono", monospace;
     }
@@ -386,7 +381,7 @@
 
   <script src="auth.js"></script>
   <script>
-    const DZ_LIST = [
+    const DEFAULT_DZ_LIST = [
       { key: "dz1", title: "ДЗ 1 • РПД" },
       { key: "dz2", title: "ДЗ 2 • РУД" },
       { key: "dz3", title: "ДЗ 3 • Свободное падение" },
@@ -399,11 +394,51 @@
       { key: "dz10", title: "ДЗ 10 • Работа. Мощность" }
     ];
 
+    let DZ_LIST = [...DEFAULT_DZ_LIST];
     let allStudents = [];
     let activeDetail = null;
 
     function esc(s) {
       return window.PhysAuth ? window.PhysAuth.escapeHtml(s) : String(s ?? "");
+    }
+
+    // Автоматически собираем актуальный список ДЗ из index.html и из ответов учеников
+    async function buildDzList(students) {
+      const map = new Map();
+      DEFAULT_DZ_LIST.forEach((d) => map.set(d.key, d.title));
+
+      try {
+        const resp = await fetch("index.html", { cache: "no-store" });
+        if (resp.ok) {
+          const html = await resp.text();
+          const doc = new DOMParser().parseFromString(html, "text/html");
+          doc.querySelectorAll(".nav-btn[href]").forEach((a) => {
+            const href = a.getAttribute("href") || "";
+            const m = href.match(/^(?:\.\/)?(dz\d+)\//i);
+            if (!m) return;
+            const key = m[1].toLowerCase();
+            const numText = a.querySelector(".btn-num")?.textContent.trim() || key.replace(/\D/g, "");
+            const titleText = a.querySelector(".btn-title")?.textContent.trim() || "";
+            map.set(key, titleText ? `ДЗ ${numText} • ${titleText}` : `ДЗ ${numText}`);
+          });
+        }
+      } catch (e) {
+        console.warn("Не удалось прочитать index.html, используем базовый список:", e);
+      }
+
+      students.forEach((st) => {
+        Object.keys(st.dz || {}).forEach((rawKey) => {
+          const key = rawKey.toLowerCase();
+          if (/^dz\d+$/i.test(key) && !map.has(key)) {
+            const num = key.replace(/\D/g, "");
+            map.set(key, `ДЗ ${num}`);
+          }
+        });
+      });
+
+      return Array.from(map.entries())
+        .sort((a, b) => Number(a[0].replace(/\D/g, "")) - Number(b[0].replace(/\D/g, "")))
+        .map(([key, title]) => ({ key, title }));
     }
 
     async function loadDashboard() {
@@ -435,6 +470,8 @@
         allStudents.sort((a, b) =>
           (a.displayName || a.login || "").localeCompare(b.displayName || b.login || "", "ru")
         );
+
+        DZ_LIST = await buildDzList(allStudents);
         renderDashboard();
       } catch (err) {
         console.error(err);
@@ -463,15 +500,16 @@
 
       const avgPct = totalSolved ? Math.round((totalCorrect / totalSolved) * 100) : 0;
 
-      let headerCols = DZ_LIST.map(
-        (d, idx) => `<th title="${esc(d.title)}">ДЗ ${idx + 1}</th>`
-      ).join("");
+      let headerCols = DZ_LIST.map((d) => {
+        const num = d.key.replace(/\D/g, "");
+        return `<th title="${esc(d.title)}">ДЗ ${esc(num)}</th>`;
+      }).join("");
 
       let rowsHtml = "";
       if (allStudents.length === 0) {
         rowsHtml = `
           <tr>
-            <td colspan="11" style="text-align:center; padding:30px; color:#94a3b8;">
+            <td colspan="${DZ_LIST.length + 1}" style="text-align:center; padding:30px; color:#94a3b8;">
               Пока ни один ученик не заходил на сайт. Как только ученики введут свой логин/пароль, они появятся здесь.
             </td>
           </tr>
@@ -580,8 +618,8 @@
 
     function openDetailModal(uid, dzKey) {
       const st = allStudents.find((s) => s.uid === uid);
-      const dzInfo = DZ_LIST.find((d) => d.key === dzKey);
-      if (!st || !dzInfo) return;
+      const dzInfo = DZ_LIST.find((d) => d.key === dzKey) || { key: dzKey, title: dzKey.toUpperCase() };
+      if (!st) return;
 
       activeDetail = { uid, dzKey };
       const tasks = st.dz?.[dzKey] || {};
@@ -610,7 +648,9 @@
               e.attempts > 1
                 ? `<span class="badge-warn">Попыток: ${e.attempts}${e.firstCorrect ? "" : " (1-я: ✕)"}</span>`
                 : `<span class="task-meta">с 1-й попытки</span>`;
-            const dt = e.updatedAt ? new Date(e.updatedAt).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
+            const dt = e.updatedAt
+              ? new Date(e.updatedAt).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
+              : "";
 
             return `
               <div class="task-row">
