@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#090a10" />
+  <title>Панель учителя • @physarea.ct</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #090a10;
+      --surface-card: rgba(18, 22, 34, 0.76);
+      --surface-elevated: rgba(26, 32, 48, 0.9);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --text-muted: #64748b;
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #6366f1;
+      --success: #10b981;
+      --warn: #f59e0b;
+      --danger: #f43f5e;
+      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono: "JetBrains Mono", monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: clip;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -15%;
+      z-index: -1;
+      pointer-events: none;
+      background-image:
+        radial-gradient(at 10% 10%, rgba(56, 189, 248, 0.14) 0px, transparent 45%),
+        radial-gradient(at 90% 25%, rgba(168, 85, 247, 0.13) 0px, transparent 45%),
+        radial-gradient(at 50% 85%, rgba(251, 113, 133, 0.10) 0px, transparent 45%);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(9, 10, 16, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .header-left, .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      padding: 8px 13px;
+      border-radius: 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn:hover { background: rgba(255, 255, 255, 0.13); }
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      border-color: transparent;
+      color: #fff;
+    }
+    .btn-danger {
+      background: rgba(244, 63, 94, 0.14);
+      border-color: rgba(244, 63, 94, 0.35);
+      color: #fda4af;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 26px 16px 60px;
+    }
+
+    .denied-box {
+      max-width: 460px;
+      margin: 60px auto;
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 30px 24px;
+      text-align: center;
+    }
+    .denied-box h2 { margin-bottom: 10px; }
+    .denied-box p { color: var(--text-sub); margin-bottom: 20px; font-size: 14px; }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .stat-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 20px;
+      backdrop-filter: blur(20px);
+    }
+    .stat-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      margin-top: 4px;
+      font-family: var(--mono);
+    }
+
+    .panel {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 20px;
+      backdrop-filter: blur(24px);
+    }
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .panel-title { font-size: 18px; font-weight: 800; }
+    .panel-hint { font-size: 13px; color: var(--text-sub); }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 820px;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid rgba(255, 255, 255, 0.04);
+      text-align: center;
+    }
+    th {
+      background: rgba(15, 20, 32, 0.95);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #cbd5e1;
+      white-space: nowrap;
+    }
+    th:first-child, td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: rgba(16, 20, 32, 0.97);
+      text-align: left;
+      padding-left: 14px;
+      min-width: 165px;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    th:first-child { z-index: 3; }
+
+    .student-cell {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .student-name { font-weight: 700; color: #fff; }
+    .student-login { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+    .edit-name-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      font-size: 13px;
+    }
+    .edit-name-btn:hover { color: #fff; }
+
+    .cell-btn {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 6px 6px;
+      color: #e2e8f0;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.2s;
+    }
+    .cell-btn:hover { transform: translateY(-1px); border-color: rgba(255, 255, 255, 0.25); }
+    .cell-btn.good {
+      background: rgba(16, 185, 129, 0.14);
+      border-color: rgba(16, 185, 129, 0.32);
+      color: #6ee7b7;
+    }
+    .cell-btn.mid {
+      background: rgba(245, 158, 11, 0.13);
+      border-color: rgba(245, 158, 11, 0.32);
+      color: #fcd34d;
+    }
+    .cell-btn.bad {
+      background: rgba(244, 63, 94, 0.13);
+      border-color: rgba(244, 63, 94, 0.32);
+      color: #fda4af;
+    }
+    .cell-empty { color: var(--text-muted); font-family: var(--mono); }
+
+    /* Модальное окно деталей по ДЗ */
+    .detail-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(5, 6, 10, 0.8);
+      backdrop-filter: blur(12px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .detail-backdrop.open { display: flex; }
+    .detail-card {
+      width: 100%;
+      max-width: 640px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      background: #121622;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+    }
+    .detail-head {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .detail-head h3 { font-size: 18px; font-weight: 800; }
+    .detail-sub { font-size: 13px; color: var(--text-sub); margin-top: 2px; }
+    .detail-body {
+      padding: 16px 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .detail-foot {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .task-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+    }
+    .task-row-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .task-num-tag {
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 4px 9px;
+      border-radius: 8px;
+      background: rgba(99, 102, 241, 0.16);
+      color: #c7d2fe;
+    }
+    .badge-ok { color: #34d399; font-weight: 700; font-size: 13px; }
+    .badge-err { color: #fb7185; font-weight: 700; font-size: 13px; }
+    .badge-warn {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(245, 158, 11, 0.15);
+      color: #fcd34d;
+    }
+    .task-meta {
+      font-size: 12px;
+      color: var(--text-sub);
+      font-family: var(--mono);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-left">
+      <a class="btn" href="index.html">← К заданиям</a>
+      <span class="brand">@physarea.ct • Учитель</span>
+    </div>
+    <div class="header-right">
+      <button class="btn" id="btn-refresh" type="button">↻ Обновить</button>
+      <button class="btn" id="btn-csv" type="button">⬇ CSV</button>
+      <button class="btn btn-danger" id="btn-logout" type="button">Выйти</button>
+    </div>
+  </header>
+
+  <main id="app-root">
+    <div class="denied-box" id="loading-box">
+      <h2>Загрузка...</h2>
+      <p>Проверяем права доступа</p>
+    </div>
+  </main>
+
+  <div class="detail-backdrop" id="detail-modal">
+    <div class="detail-card">
+      <div class="detail-head">
+        <div>
+          <h3 id="modal-title">Детали</h3>
+          <div class="detail-sub" id="modal-sub"></div>
+        </div>
+        <button class="btn" id="modal-close" type="button">✕</button>
+      </div>
+      <div class="detail-body" id="modal-body"></div>
+      <div class="detail-foot">
+        <button class="btn btn-danger" id="modal-reset-dz" type="button">Сбросить это ДЗ</button>
+        <button class="btn btn-primary" id="modal-ok" type="button">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script>
+    const DZ_LIST = [
+      { key: "dz1", title: "ДЗ 1 • РПД" },
+      { key: "dz2", title: "ДЗ 2 • РУД" },
+      { key: "dz3", title: "ДЗ 3 • Свободное падение" },
+      { key: "dz4", title: "ДЗ 4 • Движение по окружности" },
+      { key: "dz5", title: "ДЗ 5 • Законы Ньютона" },
+      { key: "dz6", title: "ДЗ 6 • Трение. Наклонная" },
+      { key: "dz7", title: "ДЗ 7 • Упругость. Тяготение" },
+      { key: "dz8", title: "ДЗ 8 • Динамика по окружности" },
+      { key: "dz9", title: "ДЗ 9 • Импульс" },
+      { key: "dz10", title: "ДЗ 10 • Работа. Мощность" }
+    ];
+
+    let allStudents = [];
+    let activeDetail = null;
+
+    function esc(s) {
+      return window.PhysAuth ? window.PhysAuth.escapeHtml(s) : String(s ?? "");
+    }
+
+    async function loadDashboard() {
+      const root = document.getElementById("app-root");
+      const PA = window.PhysAuth;
+      if (!PA || !PA.getUser()) return;
+
+      if (!PA.isTeacher()) {
+        root.innerHTML = `
+          <div class="denied-box">
+            <h2>Доступ закрыт</h2>
+            <p>Вы вошли как ученик (<strong>${esc(PA.getLoginFromEmail(PA.getUser().email))}</strong>). Эта страница открывается только под аккаунтом преподавателя.</p>
+            <a class="btn btn-primary" href="index.html">Вернуться к заданиям</a>
+          </div>
+        `;
+        return;
+      }
+
+      root.innerHTML = `<div class="denied-box"><h2>Загружаем ответы...</h2><p>Читаем базу учеников</p></div>`;
+
+      try {
+        const snap = await PA.getDb().collection("students").get();
+        allStudents = [];
+        snap.forEach((doc) => {
+          const data = doc.data();
+          if (data.email === PA.teacherEmail) return;
+          allStudents.push({ uid: doc.id, ...data });
+        });
+        allStudents.sort((a, b) =>
+          (a.displayName || a.login || "").localeCompare(b.displayName || b.login || "", "ru")
+        );
+        renderDashboard();
+      } catch (err) {
+        console.error(err);
+        root.innerHTML = `
+          <div class="denied-box">
+            <h2>Ошибка чтения базы</h2>
+            <p>Проверьте правила Firestore (раздел Rules) и авторизацию учителя.</p>
+          </div>
+        `;
+      }
+    }
+
+    function renderDashboard() {
+      const root = document.getElementById("app-root");
+      let totalSolved = 0;
+      let totalCorrect = 0;
+
+      allStudents.forEach((st) => {
+        Object.values(st.dz || {}).forEach((dzObj) => {
+          Object.values(dzObj || {}).forEach((t) => {
+            totalSolved++;
+            if (t && t.isCorrect) totalCorrect++;
+          });
+        });
+      });
+
+      const avgPct = totalSolved ? Math.round((totalCorrect / totalSolved) * 100) : 0;
+
+      let headerCols = DZ_LIST.map(
+        (d, idx) => `<th title="${esc(d.title)}">ДЗ ${idx + 1}</th>`
+      ).join("");
+
+      let rowsHtml = "";
+      if (allStudents.length === 0) {
+        rowsHtml = `
+          <tr>
+            <td colspan="11" style="text-align:center; padding:30px; color:#94a3b8;">
+              Пока ни один ученик не заходил на сайт. Как только ученики введут свой логин/пароль, они появятся здесь.
+            </td>
+          </tr>
+        `;
+      } else {
+        rowsHtml = allStudents
+          .map((st) => {
+            const label = st.displayName || st.login || "без имени";
+            const cells = DZ_LIST.map((dz) => {
+              const tasks = st.dz?.[dz.key];
+              if (!tasks || Object.keys(tasks).length === 0) {
+                return `<td><span class="cell-empty">—</span></td>`;
+              }
+              const list = Object.values(tasks);
+              const ok = list.filter((t) => t.isCorrect).length;
+              const total = st.dzMeta?.[dz.key]?.total;
+              const denom = total || list.length;
+              const ratio = denom ? ok / denom : 0;
+              const cls = ratio >= 0.8 ? "good" : ratio >= 0.45 ? "mid" : "bad";
+              const text = total ? `${ok}/${total}` : `${ok} ✓ (${list.length})`;
+              return `<td><button class="cell-btn ${cls}" data-uid="${esc(st.uid)}" data-dz="${esc(dz.key)}" type="button">${esc(text)}</button></td>`;
+            }).join("");
+
+            return `
+              <tr>
+                <td>
+                  <div class="student-cell">
+                    <div>
+                      <div class="student-name">${esc(label)}</div>
+                      <div class="student-login">${esc(st.login || "")}</div>
+                    </div>
+                    <button class="edit-name-btn" data-rename-uid="${esc(st.uid)}" title="Изменить имя" type="button">✎</button>
+                  </div>
+                </td>
+                ${cells}
+              </tr>
+            `;
+          })
+          .join("");
+      }
+
+      root.innerHTML = `
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Учеников в базе</div>
+            <div class="stat-value">${allStudents.length}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Всего ответов</div>
+            <div class="stat-value">${totalSolved}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Верных ответов</div>
+            <div class="stat-value" style="color:#34d399">${avgPct}%</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">Успеваемость по заданиям</div>
+              <div class="panel-hint">Нажмите на ячейку с баллами, чтобы увидеть каждую задачу и количество попыток</div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Ученик</th>
+                  ${headerCols}
+                </tr>
+              </thead>
+              <tbody>${rowsHtml}</tbody>
+            </table>
+          </div>
+        </div>
+      `;
+
+      root.querySelectorAll(".cell-btn").forEach((btn) => {
+        btn.addEventListener("click", () => openDetailModal(btn.dataset.uid, btn.dataset.dz));
+      });
+
+      root.querySelectorAll("[data-rename-uid]").forEach((btn) => {
+        btn.addEventListener("click", () => renameStudent(btn.dataset.renameUid));
+      });
+    }
+
+    async function renameStudent(uid) {
+      const st = allStudents.find((s) => s.uid === uid);
+      if (!st) return;
+      const current = st.displayName || st.login || "";
+      const nextName = prompt("Введите имя и фамилию ученика для таблицы:", current);
+      if (nextName === null) return;
+      const clean = nextName.trim();
+      try {
+        await window.PhysAuth.getDb().collection("students").doc(uid).set(
+          { displayName: clean || st.login },
+          { merge: true }
+        );
+        st.displayName = clean || st.login;
+        renderDashboard();
+      } catch (err) {
+        alert("Не удалось сохранить имя: " + err.message);
+      }
+    }
+
+    function openDetailModal(uid, dzKey) {
+      const st = allStudents.find((s) => s.uid === uid);
+      const dzInfo = DZ_LIST.find((d) => d.key === dzKey);
+      if (!st || !dzInfo) return;
+
+      activeDetail = { uid, dzKey };
+      const tasks = st.dz?.[dzKey] || {};
+      const entries = Object.entries(tasks).sort(
+        (a, b) => Number(a[0].replace(/^t/, "")) - Number(b[0].replace(/^t/, ""))
+      );
+
+      const okCount = entries.filter(([, e]) => e.isCorrect).length;
+      const total = st.dzMeta?.[dzKey]?.total;
+
+      document.getElementById("modal-title").textContent = `${st.displayName || st.login} — ${dzInfo.title}`;
+      document.getElementById("modal-sub").textContent =
+        `Верно: ${okCount}` + (total ? ` из ${total}` : ` (решалось: ${entries.length})`);
+
+      const body = document.getElementById("modal-body");
+      if (entries.length === 0) {
+        body.innerHTML = `<div style="color:#94a3b8">Нет сохранённых ответов.</div>`;
+      } else {
+        body.innerHTML = entries
+          .map(([tKey, e]) => {
+            const num = tKey.replace(/^t/, "");
+            const statusHtml = e.isCorrect
+              ? `<span class="badge-ok">✓ Верно</span>`
+              : `<span class="badge-err">✕ Неверно</span>`;
+            const attemptWarn =
+              e.attempts > 1
+                ? `<span class="badge-warn">Попыток: ${e.attempts}${e.firstCorrect ? "" : " (1-я: ✕)"}</span>`
+                : `<span class="task-meta">с 1-й попытки</span>`;
+            const dt = e.updatedAt ? new Date(e.updatedAt).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
+
+            return `
+              <div class="task-row">
+                <div class="task-row-left">
+                  <span class="task-num-tag">№ ${esc(num)}</span>
+                  ${statusHtml}
+                  ${attemptWarn}
+                </div>
+                <div class="task-meta">Ответ: <strong>${esc(e.answer)}</strong> ${dt ? "· " + esc(dt) : ""}</div>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      document.getElementById("detail-modal").classList.add("open");
+    }
+
+    function closeDetailModal() {
+      document.getElementById("detail-modal").classList.remove("open");
+      activeDetail = null;
+    }
+
+    document.getElementById("modal-close").addEventListener("click", closeDetailModal);
+    document.getElementById("modal-ok").addEventListener("click", closeDetailModal);
+    document.getElementById("detail-modal").addEventListener("click", (e) => {
+      if (e.target.id === "detail-modal") closeDetailModal();
+    });
+
+    document.getElementById("modal-reset-dz").addEventListener("click", async () => {
+      if (!activeDetail) return;
+      const { uid, dzKey } = activeDetail;
+      if (!confirm("Точно удалить все ответы ученика за это ДЗ?")) return;
+      try {
+        await window.PhysAuth.getDb()
+          .collection("students")
+          .doc(uid)
+          .update({
+            [`dz.${dzKey}`]: firebase.firestore.FieldValue.delete()
+          });
+        const st = allStudents.find((s) => s.uid === uid);
+        if (st && st.dz) delete st.dz[dzKey];
+        closeDetailModal();
+        renderDashboard();
+      } catch (err) {
+        alert("Ошибка сброса: " + err.message);
+      }
+    });
+
+    document.getElementById("btn-refresh").addEventListener("click", loadDashboard);
+    document.getElementById("btn-logout").addEventListener("click", () => {
+      window.PhysAuth?.getAuth()?.signOut();
+    });
+
+    document.getElementById("btn-csv").addEventListener("click", () => {
+      const headers = ["Ученик", "Логин", ...DZ_LIST.map((d) => d.title)];
+      const rows = [headers];
+      allStudents.forEach((st) => {
+        const line = [st.displayName || st.login, st.login || ""];
+        DZ_LIST.forEach((dz) => {
+          const tasks = st.dz?.[dz.key];
+          if (!tasks) {
+            line.push("0");
+          } else {
+            const list = Object.values(tasks);
+            const ok = list.filter((t) => t.isCorrect).length;
+            const total = st.dzMeta?.[dz.key]?.total;
+            line.push(total ? `${ok}/${total}` : `${ok}`);
+          }
+        });
+        rows.push(line);
+      });
+      const csv = "\uFEFF" + rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(";")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "physarea-results.csv";
+      a.click();
+    });
+
+    window.addEventListener("physauth:ready", () => {
+      loadDashboard();
+    });
+  </script>
+</body>
+</html>
