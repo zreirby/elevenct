@@ -1,8 +1,5 @@
 (function () {
-  // ==========================================================
-  // 1. ВСТАВЬ СВОЙ firebaseConfig ИЗ КОНСОЛИ FIREBASE:
-  // ==========================================================
-const FIREBASE_CONFIG = {
+  const FIREBASE_CONFIG = {
     apiKey: "AIzaSyDME6EvOZvc0RQ3oapIW9Ypv0tPXbZX1LE",
     authDomain: "physarea-ct.firebaseapp.com",
     projectId: "physarea-ct",
@@ -15,12 +12,15 @@ const FIREBASE_CONFIG = {
   const TEACHER_EMAIL = "teacher@physarea.ct";
   const FB_VER = "13.2.0";
 
-  // Определяем, где мы находимся: index.html, teacher.html или папка dz1..dz10
+  // Показывать ли ученикам кнопку "Рейтинг" на главной странице (true / false)
+  const SHOW_RATING_TO_STUDENTS = true;
+
   const pathname = window.location.pathname;
   const dzMatch = pathname.match(/\/(dz\d+)(?:\/|$)/i);
   const dzKey = dzMatch ? dzMatch[1].toLowerCase() : null;
   const isTeacherPage = /(?:^|\/)teacher\.html$/i.test(pathname);
-  const isIndexPage = !dzKey && !isTeacherPage;
+  const isRatingPage = /(?:^|\/)rating\.html$/i.test(pathname);
+  const isIndexPage = !dzKey && !isTeacherPage && !isRatingPage;
   const rootPrefix = dzKey ? "../" : "";
 
   let fbAuth = null;
@@ -54,9 +54,98 @@ const FIREBASE_CONFIG = {
     return clean.includes("@") ? clean : `${clean}@${LOGIN_DOMAIN}`;
   }
 
-  // ==========================================================
-  // 2. СТИЛИ ДЛЯ ОКНА ВХОДА, ВЕРХНЕЙ ПАНЕЛИ И ПРОГРЕССА
-  // ==========================================================
+  // Разбор логина вида 0003PHYS20261101A98H
+  function parseStudentLogin(raw) {
+    const clean = String(raw || "").trim().toUpperCase();
+    const m = clean.match(/^(\d{4})(PHYS)(\d{4})(\d{2})(IN|0[1-9]|[1-9]\d)([A-Z0-9]{4})$/);
+    if (!m) {
+      return {
+        valid: false,
+        raw: clean || String(raw || ""),
+        groupKey: "UNKNOW",
+        groupLabel: "UNKNOW",
+        studentNum: null,
+        subject: null,
+        year: null,
+        grade: null,
+        code: null
+      };
+    }
+    const [, studentNum, subject, year, grade, groupToken, code] = m;
+    const isInd = groupToken === "IN";
+    const groupNum = isInd ? null : parseInt(groupToken, 10);
+    return {
+      valid: true,
+      raw: clean,
+      groupKey: groupToken,
+      groupLabel: isInd ? "Индивидуально (IN)" : `Группа №${groupNum}`,
+      studentNum,
+      subject,
+      year,
+      grade,
+      code
+    };
+  }
+
+  function sortGroupKeys(keys) {
+    return [...keys].sort((a, b) => {
+      if (a === b) return 0;
+      if (a === "UNKNOW") return 1;
+      if (b === "UNKNOW") return -1;
+      if (a === "IN") return 1;
+      if (b === "IN") return -1;
+      return Number(a) - Number(b);
+    });
+  }
+
+  function computeRatingStats(docData) {
+    const dzMap = docData?.dz || {};
+    let totalCorrect = 0;
+    let firstTryCorrect = 0;
+    let totalSolved = 0;
+    let totalAttempts = 0;
+
+    Object.values(dzMap).forEach((tasks) => {
+      Object.values(tasks || {}).forEach((t) => {
+        if (!t) return;
+        totalSolved++;
+        totalAttempts += Number(t.attempts || 1);
+        if (t.isCorrect) totalCorrect++;
+        if (t.firstCorrect) firstTryCorrect++;
+      });
+    });
+
+    return { totalCorrect, firstTryCorrect, totalSolved, totalAttempts };
+  }
+
+  async function syncPublicRating(user, docData) {
+    if (!user || !fbDb || user.email === TEACHER_EMAIL) return;
+    const loginName = getLoginFromEmail(user.email);
+    const parsed = parseStudentLogin(loginName);
+    const stats = computeRatingStats(docData);
+
+    const payload = {
+      login: loginName,
+      groupKey: parsed.groupKey,
+      groupLabel: parsed.groupLabel,
+      studentNum: parsed.studentNum,
+      grade: parsed.grade,
+      code: parsed.code,
+      ...stats,
+      updatedAt: new Date().toISOString()
+    };
+    if (docData?.displayName) {
+      payload.displayName = docData.displayName;
+    }
+
+    try {
+      await fbDb.collection("ratings").doc(user.uid).set(payload, { merge: true });
+    } catch (err) {
+      // Не мешаем работе, если правило для ratings ещё не добавлено
+      console.warn("syncPublicRating:", err?.code || err);
+    }
+  }
+
   function injectStyles() {
     if (document.getElementById("phys-auth-styles")) return;
     const style = document.createElement("style");
@@ -100,33 +189,11 @@ const FIREBASE_CONFIG = {
         border-radius: 999px;
         margin-bottom: 14px;
       }
-      .phys-modal h2 {
-        font-size: 24px;
-        font-weight: 800;
-        margin-bottom: 6px;
-        color: #ffffff;
-      }
-      .phys-modal p {
-        font-size: 14px;
-        color: #94a3b8;
-        margin-bottom: 22px;
-      }
-      .phys-field {
-        text-align: left;
-        margin-bottom: 14px;
-      }
-      .phys-field label {
-        display: block;
-        font-size: 12px;
-        font-weight: 700;
-        color: #cbd5e1;
-        margin-bottom: 6px;
-      }
-      .phys-input-wrap {
-        position: relative;
-        display: flex;
-        align-items: center;
-      }
+      .phys-modal h2 { font-size: 24px; font-weight: 800; margin-bottom: 6px; color: #fff; }
+      .phys-modal p { font-size: 14px; color: #94a3b8; margin-bottom: 22px; }
+      .phys-field { text-align: left; margin-bottom: 14px; }
+      .phys-field label { display: block; font-size: 12px; font-weight: 700; color: #cbd5e1; margin-bottom: 6px; }
+      .phys-input-wrap { position: relative; display: flex; align-items: center; }
       .phys-input {
         width: 100%;
         background: rgba(9, 11, 18, 0.8);
@@ -134,15 +201,12 @@ const FIREBASE_CONFIG = {
         border-radius: 12px;
         padding: 13px 14px;
         font-size: 16px;
-        color: #ffffff;
+        color: #fff;
         font-family: inherit;
         outline: none;
         transition: border-color 0.2s, box-shadow 0.2s;
       }
-      .phys-input:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
-      }
+      .phys-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25); }
       .phys-eye-btn {
         position: absolute;
         right: 10px;
@@ -162,13 +226,12 @@ const FIREBASE_CONFIG = {
         border: none;
         border-radius: 12px;
         background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
-        color: #ffffff;
+        color: #fff;
         font-size: 16px;
         font-weight: 700;
         font-family: inherit;
         cursor: pointer;
         box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
-        transition: opacity 0.2s, transform 0.15s;
       }
       .phys-login-btn:active { transform: scale(0.98); }
       .phys-login-btn:disabled { opacity: 0.6; cursor: wait; }
@@ -186,7 +249,6 @@ const FIREBASE_CONFIG = {
       }
       .phys-error.visible { display: block; }
 
-      /* Верхняя панель на страницах ДЗ */
       .phys-dz-topbar {
         position: sticky;
         top: 0;
@@ -207,6 +269,7 @@ const FIREBASE_CONFIG = {
         align-items: center;
         gap: 8px;
         min-width: 0;
+        flex-wrap: wrap;
       }
       .phys-pill-btn {
         display: inline-flex;
@@ -231,6 +294,11 @@ const FIREBASE_CONFIG = {
         border-color: rgba(99, 102, 241, 0.35);
         color: #c7d2fe;
       }
+      .phys-pill-btn.rating-btn {
+        background: rgba(245, 158, 11, 0.14);
+        border-color: rgba(245, 158, 11, 0.32);
+        color: #fde68a;
+      }
       .phys-user-chip {
         font-size: 13px;
         font-weight: 700;
@@ -238,7 +306,17 @@ const FIREBASE_CONFIG = {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        max-width: 150px;
+        max-width: 170px;
+      }
+      .phys-group-tag {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 999px;
+        background: rgba(56, 189, 248, 0.14);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        color: #bae6fd;
+        white-space: nowrap;
       }
       .phys-score-chip {
         font-size: 12px;
@@ -251,8 +329,6 @@ const FIREBASE_CONFIG = {
         border-radius: 8px;
         white-space: nowrap;
       }
-
-      /* Панель пользователя на index.html */
       .phys-index-bar {
         display: flex;
         align-items: center;
@@ -289,16 +365,13 @@ const FIREBASE_CONFIG = {
       @media (max-width: 520px) {
         .phys-dz-topbar { padding: 8px 12px; }
         .phys-pill-btn { padding: 6px 10px; font-size: 12px; }
-        .phys-user-chip { max-width: 95px; font-size: 12px; }
+        .phys-user-chip { max-width: 110px; font-size: 12px; }
         .phys-score-chip { font-size: 11px; padding: 4px 8px; }
       }
     `;
     document.head.appendChild(style);
   }
 
-  // ==========================================================
-  // 3. ОКНО ВХОДА
-  // ==========================================================
   function buildOverlay() {
     if (document.getElementById("phys-auth-overlay")) return;
     const overlay = document.createElement("div");
@@ -306,7 +379,7 @@ const FIREBASE_CONFIG = {
     overlay.className = "phys-overlay";
     overlay.innerHTML = `
       <div class="phys-modal">
-        <div class="phys-modal-badge">PHYSAREA</div>
+        <div class="phys-modal-badge">@physarea.ct • Физика</div>
         <div id="phys-loading-state">
           <h2>Загрузка...</h2>
           <p style="margin-bottom:0">Проверяем авторизацию</p>
@@ -316,7 +389,7 @@ const FIREBASE_CONFIG = {
           <p>Введите логин и пароль, выданные преподавателем</p>
           <div class="phys-field">
             <label for="phys-login-inp">Логин</label>
-            <input class="phys-input" id="phys-login-inp" type="text" placeholder="Например: ivan"
+            <input class="phys-input" id="phys-login-inp" type="text" placeholder="0003PHYS20261101A98H"
               autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required />
           </div>
           <div class="phys-field">
@@ -371,7 +444,7 @@ const FIREBASE_CONFIG = {
         } else if (err.code === "auth/network-request-failed") {
           msg = "Ошибка сети. Проверьте интернет-соединение.";
         } else if (err.code === "auth/unauthorized-domain") {
-          msg = "Добавьте домен сайта в Firebase (Authentication → Settings → Authorized domains).";
+          msg = "Добавьте домен сайта в Firebase (Authorized domains).";
         }
         errBox.textContent = msg;
         errBox.classList.add("visible");
@@ -407,12 +480,30 @@ const FIREBASE_CONFIG = {
     if (overlay) overlay.classList.add("hidden");
   }
 
-  // ==========================================================
-  // 4. ВЕРХНЯЯ ПАНЕЛЬ НАВИГАЦИИ И ПРОГРЕССА
-  // ==========================================================
+  function formatDisplayLabel(user) {
+    const login = getLoginFromEmail(user.email);
+    if (studentDoc?.displayName) return studentDoc.displayName;
+    if (user.email === TEACHER_EMAIL) return "Учитель";
+    const parsed = parseStudentLogin(login);
+    if (parsed.valid) {
+      return `Ученик №${Number(parsed.studentNum)} (${parsed.code})`;
+    }
+    return login;
+  }
+
   function renderTopBar(user) {
     const isTeacher = user.email === TEACHER_EMAIL;
-    const displayName = studentDoc?.displayName || getLoginFromEmail(user.email);
+    const login = getLoginFromEmail(user.email);
+    const parsed = parseStudentLogin(login);
+    const displayName = formatDisplayLabel(user);
+
+    const ratingLink =
+      SHOW_RATING_TO_STUDENTS || isTeacher
+        ? `<a class="phys-pill-btn rating-btn" href="${rootPrefix}rating.html">🏆 Рейтинг</a>`
+        : "";
+    const teacherLink = isTeacher
+      ? `<a class="phys-pill-btn teacher-btn" href="${rootPrefix}teacher.html">Учителю</a>`
+      : "";
 
     if (dzKey) {
       let bar = document.getElementById("phys-dz-topbar");
@@ -421,15 +512,10 @@ const FIREBASE_CONFIG = {
         bar.id = "phys-dz-topbar";
         bar.className = "phys-dz-topbar";
         document.body.prepend(bar);
-        // Убираем лишний верхний отступ у старых ДЗ
         if (parseInt(getComputedStyle(document.body).paddingTop, 10) > 20) {
           document.body.style.paddingTop = "0";
         }
       }
-
-      const teacherLink = isTeacher
-        ? `<a class="phys-pill-btn teacher-btn" href="${rootPrefix}teacher.html">Учителю</a>`
-        : "";
 
       bar.innerHTML = `
         <div class="phys-topbar-left">
@@ -438,7 +524,7 @@ const FIREBASE_CONFIG = {
         </div>
         <div class="phys-topbar-right">
           ${teacherLink}
-          <span class="phys-user-chip" title="${escapeHtml(displayName)}">${escapeHtml(displayName)}</span>
+          <span class="phys-user-chip" title="${escapeHtml(parsed.raw)}">${escapeHtml(displayName)}</span>
           <button class="phys-pill-btn" id="phys-logout-btn" type="button">Выйти</button>
         </div>
       `;
@@ -454,15 +540,17 @@ const FIREBASE_CONFIG = {
         mainEl.prepend(bar);
       }
 
-      const teacherLink = isTeacher
-        ? `<a class="phys-pill-btn teacher-btn" href="teacher.html">Панель учителя</a>`
+      const groupTag = !isTeacher
+        ? `<span class="phys-group-tag">${escapeHtml(parsed.groupLabel)}</span>`
         : "";
 
       bar.innerHTML = `
         <div class="phys-topbar-left">
-          <span class="phys-user-chip" style="max-width:200px">👤 ${escapeHtml(displayName)}</span>
+          <span class="phys-user-chip" style="max-width:210px" title="${escapeHtml(parsed.raw)}">👤 ${escapeHtml(displayName)}</span>
+          ${groupTag}
         </div>
         <div class="phys-topbar-right">
+          ${ratingLink}
           ${teacherLink}
           <button class="phys-pill-btn" id="phys-logout-btn" type="button">Выйти</button>
         </div>
@@ -491,7 +579,7 @@ const FIREBASE_CONFIG = {
 
     document.querySelectorAll(".nav-btn[href]").forEach((btn) => {
       const href = btn.getAttribute("href") || "";
-      const m = href.match(/^(dz\d+)\//i);
+      const m = href.match(/^(?:\.\/)?(dz\d+)\//i);
       if (!m) return;
       const key = m[1].toLowerCase();
       const tasks = dzMap[key];
@@ -514,9 +602,6 @@ const FIREBASE_CONFIG = {
     });
   }
 
-  // ==========================================================
-  // 5. ПЕРЕХВАТ ЗАДАЧ И ВОССТАНОВЛЕНИЕ ОТВЕТОВ (ОБА ШАБЛОНА)
-  // ==========================================================
   function installTaskHooks() {
     if (!dzKey || hooksInstalled) return;
     if (typeof window.handleChoice === "function" && typeof window.validateCalculation === "function") {
@@ -572,6 +657,7 @@ const FIREBASE_CONFIG = {
     const prev = studentDoc.dz[dzKey][tKey];
     const nowIso = new Date().toISOString();
     const loginName = getLoginFromEmail(currentUser.email);
+    const parsed = parseStudentLogin(loginName);
 
     const taskPayload = {
       answer: String(answer),
@@ -595,6 +681,8 @@ const FIREBASE_CONFIG = {
           {
             login: loginName,
             email: currentUser.email,
+            groupKey: parsed.groupKey,
+            groupLabel: parsed.groupLabel,
             updatedAt: nowIso,
             dzMeta: {
               [dzKey]: { total: totalTasks }
@@ -607,6 +695,7 @@ const FIREBASE_CONFIG = {
           },
           { merge: true }
         );
+      await syncPublicRating(currentUser, studentDoc);
     } catch (err) {
       console.error("Ошибка сохранения ответа:", err);
     }
@@ -654,9 +743,6 @@ const FIREBASE_CONFIG = {
     }
   }
 
-  // ==========================================================
-  // 6. ЗАГРУЗКА FIREBASE SDK И СТАРТ
-  // ==========================================================
   function loadScript(src) {
     return new Promise((resolve, reject) => {
       if (document.querySelector(`script[src="${src}"]`)) {
@@ -677,12 +763,7 @@ const FIREBASE_CONFIG = {
     installTaskHooks();
 
     if (window.location.protocol === "file:") {
-      showLoginForm("Для работы аккаунтов откройте сайт через GitHub Pages или Live Server (не через file://).");
-      return;
-    }
-
-    if (!FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey.includes("ВСТАВЬ_СЮДА")) {
-      showLoginForm("Не вставлен firebaseConfig в файле auth.js.");
+      showLoginForm("Для работы аккаунтов откройте сайт через GitHub Pages или Live Server.");
       return;
     }
 
@@ -701,10 +782,15 @@ const FIREBASE_CONFIG = {
         getAuth: () => fbAuth,
         getDb: () => fbDb,
         getUser: () => currentUser,
+        getStudentDoc: () => studentDoc,
         isTeacher: () => currentUser && currentUser.email === TEACHER_EMAIL,
         teacherEmail: TEACHER_EMAIL,
         loginDomain: LOGIN_DOMAIN,
+        showRatingToStudents: SHOW_RATING_TO_STUDENTS,
         getLoginFromEmail,
+        parseStudentLogin,
+        sortGroupKeys,
+        computeRatingStats,
         escapeHtml
       };
 
@@ -717,21 +803,41 @@ const FIREBASE_CONFIG = {
           return;
         }
 
+        const loginName = getLoginFromEmail(user.email);
+        const parsed = parseStudentLogin(loginName);
+
         try {
           const docSnap = await fbDb.collection("students").doc(user.uid).get();
           if (docSnap.exists) {
             studentDoc = docSnap.data();
           } else {
-            const loginName = getLoginFromEmail(user.email);
-            studentDoc = { login: loginName, email: user.email, dz: {}, dzMeta: {} };
-            // Создаём карточку ученика сразу после первого входа (чтобы учитель видел его в списке)
+            studentDoc = {
+              login: loginName,
+              email: user.email,
+              groupKey: parsed.groupKey,
+              groupLabel: parsed.groupLabel,
+              dz: {},
+              dzMeta: {}
+            };
             if (user.email !== TEACHER_EMAIL) {
               fbDb
                 .collection("students")
                 .doc(user.uid)
-                .set({ login: loginName, email: user.email, updatedAt: new Date().toISOString() }, { merge: true })
+                .set(
+                  {
+                    login: loginName,
+                    email: user.email,
+                    groupKey: parsed.groupKey,
+                    groupLabel: parsed.groupLabel,
+                    updatedAt: new Date().toISOString()
+                  },
+                  { merge: true }
+                )
                 .catch(() => {});
             }
+          }
+          if (user.email !== TEACHER_EMAIL) {
+            syncPublicRating(user, studentDoc);
           }
         } catch (err) {
           console.error("Ошибка загрузки профиля:", err);
