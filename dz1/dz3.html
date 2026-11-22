@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Д/З 3 • Равномерное прямолинейное движение</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+  <!-- KaTeX для формул -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="initMath()"></script>
+
+  <style>
+    :root {
+      --bg-main: #090a10;
+      --surface-card: rgba(18, 22, 34, 0.72);
+      --surface-elevated: rgba(26, 32, 48, 0.85);
+      --surface-input: rgba(13, 16, 26, 0.7);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --text-muted: #64748b;
+      
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-glow: rgba(99, 102, 241, 0.25);
+      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+      
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.2);
+      --error: #f43f5e;
+      --error-glow: rgba(244, 63, 94, 0.2);
+      
+      --border: rgba(255, 255, 255, 0.08);
+      --radius-xl: 24px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      
+      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg-main);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 20%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+        radial-gradient(at 50% 80%, rgba(236, 72, 153, 0.07) 0px, transparent 50%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      line-height: 1.6;
+      padding-top: 40px;
+      padding-bottom: 140px;
+      overflow-x: hidden;
+    }
+
+    /* Главный контейнер */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      padding: 5px 16px;
+      border-radius: 30px;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-sub);
+    }
+
+    /* Карточки задач */
+    .card {
+      background: var(--surface-card);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      padding: 32px;
+      margin-bottom: 28px;
+      transition: transform 0.35s var(--ease-spring), box-shadow 0.35s var(--ease-spring), border-color 0.35s var(--ease-spring);
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 28px 50px -15px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    .task-num {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      padding: 4px 12px;
+      border-radius: 30px;
+      margin-bottom: 16px;
+    }
+
+    .task-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.55;
+      margin-bottom: 14px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 4px;
+    }
+
+    .task-desc {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-sub);
+      margin-bottom: 14px;
+    }
+
+    /* Блоки с картинками */
+    .task-image-box {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin: 16px 0 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .task-image-box img {
+      max-width: 100%;
+      max-height: 240px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+
+    .img-caption {
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    /* Поля ввода и кнопки */
+    .input-action-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .input-text {
+      flex: 1;
+      min-width: 200px;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--surface-input);
+      color: var(--text-main);
+      outline: none;
+      transition: all 0.25s var(--ease-spring);
+    }
+
+    .input-text:focus {
+      border-color: var(--accent);
+      background: rgba(20, 26, 42, 0.9);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .btn-main {
+      background: var(--accent-gradient);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 14px 26px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.25s var(--ease-spring);
+      box-shadow: 0 4px 18px var(--accent-glow);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-main:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4);
+      filter: brightness(1.1);
+    }
+
+    .btn-main:active {
+      transform: scale(0.97);
+    }
+
+    /* Кнопки вариантов ответов */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .options-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .btn-option {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.25s var(--ease-spring);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .options-vertical .btn-option {
+      justify-content: flex-start;
+      text-align: left;
+      padding: 14px 20px;
+    }
+
+    .btn-option:hover:not(:disabled) {
+      background: rgba(45, 55, 80, 0.95);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-option:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    .btn-option.correct {
+      background: var(--success) !important;
+      border-color: var(--success) !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 24px var(--success-glow) !important;
+    }
+
+    .btn-option.incorrect {
+      background: var(--error) !important;
+      border-color: var(--error) !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 24px var(--error-glow) !important;
+    }
+
+    /* Уведомления и решение */
+    .status-msg {
+      display: none;
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 700;
+      animation: smoothSlideIn 0.35s var(--ease-spring) forwards;
+    }
+
+    .status-msg.correct {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .status-msg.incorrect {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(244, 63, 94, 0.1);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.25);
+    }
+
+    .btn-solution {
+      display: none;
+      margin-top: 14px;
+      background: rgba(244, 63, 94, 0.08);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.25);
+      padding: 11px 22px;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.25s var(--ease-spring);
+    }
+
+    .btn-solution:hover {
+      background: rgba(244, 63, 94, 0.16);
+      border-color: #f43f5e;
+      transform: translateY(-1px);
+    }
+
+    /* Блок решения с полной адаптивностью */
+    .solution-box {
+      display: none;
+      margin-top: 18px;
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: var(--radius-lg);
+      border-left: 4px solid var(--accent);
+      border-right: 1px solid var(--border);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 22px 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.75;
+      color: #e2e8f0;
+      animation: smoothSlideIn 0.4s var(--ease-spring) forwards;
+      max-width: 100%;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .solution-box strong {
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .solution-box p, .solution-box div {
+      margin-bottom: 10px;
+    }
+
+    .solution-box ol, .solution-box ul {
+      margin-left: 22px;
+      margin-bottom: 12px;
+    }
+
+    .solution-box li {
+      margin-bottom: 6px;
+    }
+
+    .math-scroll {
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 10px 0;
+      margin: 8px 0;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .math-scroll::-webkit-scrollbar,
+    .task-title::-webkit-scrollbar,
+    .solution-box::-webkit-scrollbar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+
+    .math-scroll::-webkit-scrollbar-thumb,
+    .task-title::-webkit-scrollbar-thumb,
+    .solution-box::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.5);
+      border-radius: 10px;
+    }
+
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 8px 0;
+      margin: 6px 0 !important;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .katex-display::-webkit-scrollbar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+
+    .katex-display::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.5);
+      border-radius: 10px;
+    }
+
+    @keyframes smoothSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.99);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <div class="hero">
+      <div class="hero-badge">Д/З 3 • Тест 1</div>
+      <h1>Равномерное прямолинейное движение</h1>
+      <p>Выберите вариант ответа или введите числовое значение.</p>
+    </div>
+
+    <!-- Задача 1 -->
+    <div class="card" id="task-1">
+      <div class="task-num">Задача 1</div>
+      <div class="task-title">Мяч с высоты $h_0 = 1\text{ м}$ был подброшен вертикально вверх еще на $h = 3\text{ м}$ и упал на землю. Путь и модуль перемещения мяча составляют:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(1, '1', this)">1) $7\text{ м; } 1\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(1, '2', this)">2) $4\text{ м; } 7\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(1, '3', this)">3) $4\text{ м; } 1\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(1, '4', this)">4) $5\text{ м; } 3\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(1, '5', this)">5) $5\text{ м; } 2\text{ м}$</button>
+      </div>
+      <div class="status-msg" id="status-1"></div>
+      <button class="btn-solution" id="btn-sol-1" onclick="toggleSolution(1)">Показать Решение</button>
+      <div class="solution-box" id="sol-1">
+        <ol>
+          <li><strong>Путь ($S$)</strong> — это общая длина траектории, которую пролетел мяч:
+            <ul>
+              <li>Вверх мяч пролетел: $s_1 = 3\text{ м}$.</li>
+              <li>Вниз (от максимальной точки до земли): $s_2 = 1\text{ м} + 3\text{ м} = 4\text{ м}$.</li>
+              <li>Весь путь: $S = s_1 + s_2 = 3 + 4 = 7\text{ м}$.</li>
+            </ul>
+          </li>
+          <li><strong>Модуль перемещения ($|\Delta\vec{r}|$)</strong> — это расстояние по прямой между начальной и конечной точками:
+            <ul>
+              <li>Начальная точка: 1 м над землей.</li>
+              <li>Конечная точка: 0 м (на земле).</li>
+              <li>Расстояние между ними: $|\Delta\vec{r}| = 1 - 0 = 1\text{ м}$.</li>
+            </ul>
+          </li>
+        </ol>
+        <strong>Ответ:</strong> вариант 1 ($7\text{ м; } 1\text{ м}$).
+      </div>
+    </div>
+
+    <!-- Задача 2 -->
+    <div class="card" id="task-2">
+      <div class="task-num">Задача 2</div>
+      <div class="task-title">Если материальная точка в течение времени $t = 20\text{ с}$ двигалась со скоростью, модуль которой $v = 4{,}0\text{ м/с}$, то модуль ее перемещения составил:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(2, '1', this)">1) $5{,}0\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(2, '2', this)">2) $24\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(2, '3', this)">3) $40\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(2, '4', this)">4) $80\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(2, '5', this)">5) $0{,}80\text{ км}$</button>
+      </div>
+      <div class="status-msg" id="status-2"></div>
+      <button class="btn-solution" id="btn-sol-2" onclick="toggleSolution(2)">Показать Решение</button>
+      <div class="solution-box" id="sol-2">
+        <p>При равномерном прямолинейном движении модуль перемещения ($s$) находится как произведение модуля скорости ($v$) на время движения ($t$):</p>
+        <div class="math-scroll">
+          $$s = v \cdot t$$
+          $$s = 4{,}0\text{ м/с} \cdot 20\text{ с} = 80\text{ м}$$
+        </div>
+        <strong>Ответ:</strong> вариант 4 ($80\text{ м}$).
+      </div>
+    </div>
+
+    <!-- Задача 3 -->
+    <div class="card" id="task-3">
+      <div class="task-num">Задача 3</div>
+      <div class="task-title">По арене цирка лошадь пробежала круг за время $t_1 = 30\text{ с}$. Путь, пройденный лошадью за $t_2 = 15\text{ с}$, больше модуля ее перемещения за $t_3 = 45\text{ с}$ движения:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(3, '1', this)">1) в $\frac{\pi}{2}$ раза</button>
+        <button class="btn-option" onclick="handleChoice(3, '2', this)">2) в $\pi$ раз</button>
+        <button class="btn-option" onclick="handleChoice(3, '3', this)">3) в $2\pi$ раз</button>
+        <button class="btn-option" onclick="handleChoice(3, '4', this)">4) в $2$ раза</button>
+        <button class="btn-option" onclick="handleChoice(3, '5', this)">5) в $3$ раза</button>
+      </div>
+      <div class="status-msg" id="status-3"></div>
+      <button class="btn-solution" id="btn-sol-3" onclick="toggleSolution(3)">Показать Решение</button>
+      <div class="solution-box" id="sol-3">
+        <p>Обозначим радиус арены цирка как $R$. Тогда длина одного полного круга равна $L = 2\pi R$. Лошадь пробегает этот круг за $t_1 = 30\text{ с}$.</p>
+        <ol>
+          <li><strong>Путь за $t_2 = 15\text{ с}$ :</strong>
+            <ul>
+              <li>Время 15 с — это ровно половина круга $\left(\frac{15}{30} = \frac{1}{2}\right)$.</li>
+              <li>Пройденный путь $S$ равен половине длины окружности:
+                <div class="math-scroll">
+                  $$S = \frac{L}{2} = \frac{2\pi R}{2} = \pi R$$
+                </div>
+              </li>
+            </ul>
+          </li>
+          <li><strong>Модуль перемещения за $t_3 = 45\text{ с}$ :</strong>
+            <ul>
+              <li>Время 45 с — это полтора круга $\left(\frac{45}{30} = 1{,}5\right)$.</li>
+              <li>Сделав один полный круг, лошадь возвращается в начальную точку, а за оставшиеся полкруга оказывается на противоположной стороне арены.</li>
+              <li>Модуль перемещения $|\Delta\vec{r}|$ (расстояние по прямой от старта до финиша) равен диаметру окружности:
+                <div class="math-scroll">
+                  $$|\Delta\vec{r}| = 2R$$
+                </div>
+              </li>
+            </ul>
+          </li>
+        </ol>
+        <p><strong>Найдем отношение пути к модулю перемещения:</strong></p>
+        <div class="math-scroll">
+          $$\frac{S}{|\Delta\vec{r}|} = \frac{\pi R}{2R} = \frac{\pi}{2}$$
+        </div>
+        <strong>Ответ:</strong> вариант 1 (в $\frac{\pi}{2}$ раза).
+      </div>
+    </div>
+
+    <!-- Задача 4 -->
+    <div class="card" id="task-4">
+      <div class="task-num">Задача 4</div>
+      <div class="task-title">Материальная точка движется прямолинейно так, что в момент времени $t_1 = 4\text{ с}$ ее координата $x_1 = 6\text{ м}$, а к моменту времени $t_2 = 8\text{ с}$ ее координата $x_2 = -2\text{ м}$. Путь и проекция перемещения точки за $t = 2\text{ с}$ составляют:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(4, '1', this)">1) $5\text{ м; } 5\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(4, '2', this)">2) $2\text{ м; } -1\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(4, '3', this)">3) $4\text{ м; } -4\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(4, '4', this)">4) $8\text{ м; } -2\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(4, '5', this)">5) $8\text{ м; } -8\text{ м}$</button>
+      </div>
+      <div class="status-msg" id="status-4"></div>
+      <button class="btn-solution" id="btn-sol-4" onclick="toggleSolution(4)">Показать Решение</button>
+      <div class="solution-box" id="sol-4">
+        <ol>
+          <li><strong>Проекция перемещения ($\Delta r_x$)</strong> — это изменение координаты от начального до конечного момента:
+            <div class="math-scroll">
+              $$\Delta r_x = x_2 - x_1 = -2\text{ м} - 6\text{ м} = -8\text{ м}$$
+            </div>
+            (Знак «минус» показывает, что тело переместилось против направления координатной оси).
+          </li>
+          <li><strong>Путь ($S$)</strong> — это длина траектории. Так как движение прямолинейное и точка не меняла направление, пройденный путь равен модулю проекции перемещения:
+            <div class="math-scroll">
+              $$S = |\Delta r_x| = |-8\text{ м}| = 8\text{ м}$$
+            </div>
+          </li>
+        </ol>
+        <strong>Ответ:</strong> вариант 5 ($8\text{ м; } -8\text{ м}$).
+      </div>
+    </div>
+
+    <!-- Задача 5 -->
+    <div class="card" id="task-5">
+      <div class="task-num">Задача 5</div>
+      <div class="task-title">По оси $Ox$ движутся две точки, координаты которых меняются по законам $x_1 = 10 + 2{,}0t$ и $x_2 = 4 - 5{,}0t$. Точки встретятся в момент времени:</div>
+      <div class="options-vertical">
+        <button class="btn-option" onclick="handleChoice(5, '1', this)">1) $3{,}5\text{ с}$</button>
+        <button class="btn-option" onclick="handleChoice(5, '2', this)">2) $2{,}0\text{ с}$</button>
+        <button class="btn-option" onclick="handleChoice(5, '3', this)">3) $3{,}0\text{ с}$</button>
+        <button class="btn-option" onclick="handleChoice(5, '4', this)">4) $7{,}0\text{ с}$</button>
+        <button class="btn-option" onclick="handleChoice(5, '5', this)">5) точки вообще не встретятся</button>
+      </div>
+      <div class="status-msg" id="status-5"></div>
+      <button class="btn-solution" id="btn-sol-5" onclick="toggleSolution(5)">Показать Решение</button>
+      <div class="solution-box" id="sol-5">
+        <ol>
+          <li><strong>Условие встречи точек</strong> — равенство их координат ($x_1 = x_2$):
+            <div class="math-scroll">
+              $$10 + 2{,}0t = 4 - 5{,}0t$$
+            </div>
+          </li>
+          <li><strong>Решаем уравнение относительно времени ($t$):</strong>
+            <div class="math-scroll">
+              $$2{,}0t + 5{,}0t = 4 - 10$$
+              $$t = -\frac{6}{7}\text{ с}$$
+            </div>
+          </li>
+        </ol>
+        <p>Время встречи получилось отрицательным, что невозможно (так как движение рассматривается от момента $t = 0$ и далее в будущее). В начальный момент времени первая точка находилась в $x_1 = 10\text{ м}$ и двигалась вправо, а вторая — в $x_2 = 4\text{ м}$ и двигалась влево, то есть они изначально удалялись друг от друга.</p>
+        <strong>Ответ:</strong> вариант 5 (точки вообще не встретятся).
+      </div>
+    </div>
+
+    <!-- Задача 6 (Рис. 1 -> pic1.png) -->
+    <div class="card" id="task-6">
+      <div class="task-num">Задача 6</div>
+      <div class="task-title">На рисунке 1 представлен график зависимости координаты $x$ рыбонадзорного катера, курсирующего по Неману, от времени $t$. Если катер двигался вдоль оси $Ox$, то модуль перемещения $\Delta r$ катера за промежуток времени $\Delta t = 48\text{ мин}$, считая с момента начала отсчета времени, равен:</div>
+      <div class="task-image-box">
+        <img src="pic1.png" alt="Рис. 1" onerror="this.src='https://via.placeholder.com/400x200?text=pic1.png';" />
+        <div class="img-caption">Рис. 1</div>
+      </div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(6, '1', this)">1) $3\text{ км}$</button>
+        <button class="btn-option" onclick="handleChoice(6, '2', this)">2) $9\text{ км}$</button>
+        <button class="btn-option" onclick="handleChoice(6, '3', this)">3) $12\text{ км}$</button>
+        <button class="btn-option" onclick="handleChoice(6, '4', this)">4) $18\text{ км}$</button>
+        <button class="btn-option" onclick="handleChoice(6, '5', this)">5) $27\text{ км}$</button>
+      </div>
+      <div class="status-msg" id="status-6"></div>
+      <button class="btn-solution" id="btn-sol-6" onclick="toggleSolution(6)">Показать Решение</button>
+      <div class="solution-box" id="sol-6">
+        <p>За промежуток времени $\Delta t = 48\text{ мин} = 0{,}8\text{ ч}$ проекция перемещения катера равна изменению его координаты: $\Delta r_x = x - x_0 = -9\text{ км}$, где $x_0 = 12\text{ км}$, $x = 3\text{ км}$. Модуль перемещения катера $\Delta r = |\Delta r_x| = 9\text{ км}$.</p>
+        <strong>Ответ:</strong> вариант 2 ($9\text{ км}$).
+      </div>
+    </div>
+
+    <!-- Задача 7 (Рис. 2 -> pic2.png) -->
+    <div class="card" id="task-7">
+      <div class="task-num">Задача 7</div>
+      <div class="task-title">На рисунке 2 представлен график зависимости координаты $x$ сольпуги (самый быстрый в мире паук), движущейся вдоль оси $Ox$, от времени $t$. Путь $s$, пройденный сольпугой за промежуток времени $\Delta t = 12\text{ с}$, считая с момента начала отсчета времени, равен:</div>
+      <div class="task-image-box">
+        <img src="pic2.png" alt="Рис. 2" onerror="this.src='https://via.placeholder.com/400x200?text=pic2.png';" />
+        <div class="img-caption">Рис. 2</div>
+      </div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(7, '1', this)">1) $9\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(7, '2', this)">2) $12\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(7, '3', this)">3) $18\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(7, '4', this)">4) $21\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(7, '5', this)">5) $27\text{ м}$</button>
+      </div>
+      <div class="status-msg" id="status-7"></div>
+      <button class="btn-solution" id="btn-sol-7" onclick="toggleSolution(7)">Показать Решение</button>
+      <div class="solution-box" id="sol-7">
+        <p>Так как при прямолинейном движении путь равен модулю перемещения, то весь путь сольпуги найдем, сложив модули перемещений, совершенные на отдельных прямолинейных участках траектории: $s = \Delta r_1 + \Delta r_2 + \Delta r_3 + \Delta r_4$.</p>
+        <p>Модуль перемещения $\Delta r_1 = |x_1 - x_0| = |12\text{ м} - 6\text{ м}| = 6\text{ м}$; $\Delta r_2 = |x_2 - x_1| = |-6\text{ м} - 12\text{ м}| = 18\text{ м}$; $\Delta r_3 = |x_3 - x_2| = 0\text{ м}$; $\Delta r_4 = |x_4 - x_3| = |-3\text{ м} - (-6)\text{ м}| = 3\text{ м}$.</p>
+        <p>Следовательно, $s = 27\text{ м}$.</p>
+        <strong>Ответ:</strong> вариант 5 ($27\text{ м}$).
+      </div>
+    </div>
+
+    <!-- Задача 8 -->
+    <div class="card" id="task-8">
+      <div class="task-num">Задача 8</div>
+      <div class="task-title">Если человек сначала прошел по прямолинейному проспекту путь $s_1 = 240\text{ м}$, затем повернул на перекрестке на улицу, расположенную перпендикулярно проспекту, и прошел по ней путь $s_2 = 70\text{ м}$, то за все время движения путь, пройденный человеком, больше его модуля перемещения $(s - \Delta r)$ на:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(8, '1', this)">1) $0\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(8, '2', this)">2) $24\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(8, '3', this)">3) $40\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(8, '4', this)">4) $60\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(8, '5', this)">5) $0{,}17\text{ км}$</button>
+      </div>
+      <div class="status-msg" id="status-8"></div>
+      <button class="btn-solution" id="btn-sol-8" onclick="toggleSolution(8)">Показать Решение</button>
+      <div class="solution-box" id="sol-8">
+        <p>За все время движения путь человека $s = s_1 + s_2 = 310\text{ м}$, модуль его перемещения, определяемый по теореме Пифагора,</p>
+        <div class="math-scroll">
+          $$\Delta r = \sqrt{s_1^2 + s_2^2} = 250\text{ м}.$$
+        </div>
+        <strong>Ответ:</strong> $s - \Delta r = 60\text{ м}$ (вариант 4).
+      </div>
+    </div>
+
+    <!-- Задача 9 -->
+    <div class="card" id="task-9">
+      <div class="task-num">Задача 9</div>
+      <div class="task-title">Тело равномерно движется вдоль оси $Ox$. Если в момент времени $t_1 = 2\text{ с}$ его координата $x_1 = 6\text{ м}$, а в момент времени $t_2 = 8\text{ с}$ — $x_2 = -24\text{ м}$, то модуль скорости $v$ движения тела равен:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(9, '1', this)">1) $1\text{ м/с}$</button>
+        <button class="btn-option" onclick="handleChoice(9, '2', this)">2) $2\text{ м/с}$</button>
+        <button class="btn-option" onclick="handleChoice(9, '3', this)">3) $3\text{ м/с}$</button>
+        <button class="btn-option" onclick="handleChoice(9, '4', this)">4) $4\text{ м/с}$</button>
+        <button class="btn-option" onclick="handleChoice(9, '5', this)">5) $5\text{ м/с}$</button>
+      </div>
+      <div class="status-msg" id="status-9"></div>
+      <button class="btn-solution" id="btn-sol-9" onclick="toggleSolution(9)">Показать Решение</button>
+      <div class="solution-box" id="sol-9">
+        <p>Дважды запишем кинематический закон движения тела: $x_1 = x_0 + v_x t_1$ и $x_2 = x_0 + v_x t_2$. Из записанных уравнений найдем проекцию скорости:</p>
+        <div class="math-scroll">
+          $$v_x = \frac{x_2 - x_1}{t_2 - t_1} = -5\text{ }\frac{\text{м}}{\text{с}}.$$
+        </div>
+        <p>Модуль скорости движения тела:</p>
+        <div class="math-scroll">
+          $$v = |v_x| = 5\text{ }\frac{\text{м}}{\text{с}}.$$
+        </div>
+        <strong>Ответ:</strong> вариант 5 ($5\text{ м/с}$).
+      </div>
+    </div>
+
+    <!-- Задача 10 (Рис. 4 -> pic3.png) -->
+    <div class="card" id="task-10">
+      <div class="task-num">Задача 10</div>
+      <div class="task-title">График проекции скорости материальной точки, движущейся вдоль оси $Ox$, показан на рисунке 4. Модуль перемещения $\Delta r$ точки за промежуток времени $\Delta t = 6\text{ с}$, считая с момента начала отсчета времени, равен:</div>
+      <div class="task-image-box">
+        <img src="pic3.png" alt="Рис. 4" onerror="this.src='https://via.placeholder.com/400x200?text=pic3.png';" />
+        <div class="img-caption">Рис. 4</div>
+      </div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(10, '1', this)">1) $4\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(10, '2', this)">2) $6\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(10, '3', this)">3) $8\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(10, '4', this)">4) $10\text{ м}$</button>
+        <button class="btn-option" onclick="handleChoice(10, '5', this)">5) $12\text{ м}$</button>
+      </div>
+      <div class="status-msg" id="status-10"></div>
+      <button class="btn-solution" id="btn-sol-10" onclick="toggleSolution(10)">Показать Решение</button>
+      <div class="solution-box" id="sol-10">
+        <p>Проекция перемещения материальной точки численно равна площади между графиком проекции скорости и осью времени (рис. 4): $\Delta r_{1x} = 6\text{ м}$, $\Delta r_{2x} = 2\text{ м}$ и $\Delta r_{3x} = -4\text{ м}$.</p>
+        <p>За промежуток времени $\Delta t$ модуль перемещения:</p>
+        <div class="math-scroll">
+          $$\Delta r = |\Delta r_{1x} + \Delta r_{2x} + \Delta r_{3x}| = 4\text{ м}.$$
+        </div>
+        <strong>Ответ:</strong> вариант 1 ($4\text{ м}$).
+      </div>
+    </div>
+
+    <!-- Задача 11 (Рис. 5 -> pic4.png) -->
+    <div class="card" id="task-11">
+      <div class="task-num">Задача 11</div>
+      <div class="task-title">Велосипедист движется с постоянной скоростью по направлению оси $Ox$. На рисунке 5 показаны его положения в моменты времени $t_1 = 7\text{ с}$ и $t_2 = 11\text{ с}$. Кинематический закон движения велосипедиста имеет вид, указанный под номером:</div>
+      <div class="task-image-box">
+        <img src="pic4.png" alt="Рис. 5" onerror="this.src='https://via.placeholder.com/450x180?text=pic4.png';" />
+        <div class="img-caption">Рис. 5</div>
+      </div>
+      <div class="options-vertical">
+        <button class="btn-option" onclick="handleChoice(11, '1', this)">1) $x = -60\text{ (м)} + 10\left(\frac{\text{м}}{\text{с}}\right)t$</button>
+        <button class="btn-option" onclick="handleChoice(11, '2', this)">2) $x = -50\text{ (м)} + 10\left(\frac{\text{м}}{\text{с}}\right)t$</button>
+        <button class="btn-option" onclick="handleChoice(11, '3', this)">3) $x = 0\text{ (м)} + 12\left(\frac{\text{м}}{\text{с}}\right)t$</button>
+        <button class="btn-option" onclick="handleChoice(11, '4', this)">4) $x = 10\text{ (м)} + 4\left(\frac{\text{м}}{\text{с}}\right)t$</button>
+        <button class="btn-option" onclick="handleChoice(11, '5', this)">5) $x = 20\text{ (м)} + 10\left(\frac{\text{м}}{\text{с}}\right)t$</button>
+      </div>
+      <div class="status-msg" id="status-11"></div>
+      <button class="btn-solution" id="btn-sol-11" onclick="toggleSolution(11)">Показать Решение</button>
+      <div class="solution-box" id="sol-11">
+        <p>Дважды запишем кинематический закон равномерного движения велосипедиста: $x_1 = x_0 + v_x t_1$ и $x_2 = x_0 + v_x t_2$, где $x_1 = 20\text{ м}$, $x_2 = 60\text{ м}$.</p>
+        <p>Определив из записанных уравнений проекцию скорости $v_x = 10\text{ }\frac{\text{м}}{\text{с}}$ и начальную координату $x_0 = -50\text{ м}$, запишем кинематический закон движения велосипедиста:</p>
+        <div class="math-scroll">
+          $$x = -50\text{ (м)} + 10\left(\frac{\text{м}}{\text{с}}\right)t.$$
+        </div>
+        <strong>Ответ:</strong> вариант 2.
+      </div>
+    </div>
+
+    <!-- Задача 12 -->
+    <div class="card" id="task-12">
+      <div class="task-num">Задача 12</div>
+      <div class="task-title">Мимо пассажира электропоезда, движущегося равномерно со скоростью, модуль которой $v_1 = 54\text{ км/ч}$, проехал пассажирский поезд длиной $l = 300\text{ м}$, который двигался по соседнему пути, обгоняя электропоезд. Если за время обгона электропоезд проехал относительно земли путь $s = 900\text{ м}$, то модуль скорости $v_2$ движения пассажирского поезда равен:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(12, '1', this)">1) $60\text{ км/ч}$</button>
+        <button class="btn-option" onclick="handleChoice(12, '2', this)">2) $72\text{ км/ч}$</button>
+        <button class="btn-option" onclick="handleChoice(12, '3', this)">3) $80\text{ км/ч}$</button>
+        <button class="btn-option" onclick="handleChoice(12, '4', this)">4) $90\text{ км/ч}$</button>
+        <button class="btn-option" onclick="handleChoice(12, '5', this)">5) $108\text{ км/ч}$</button>
+      </div>
+      <div class="status-msg" id="status-12"></div>
+      <button class="btn-solution" id="btn-sol-12" onclick="toggleSolution(12)">Показать Решение</button>
+      <div class="solution-box" id="sol-12">
+        <p>Пассажирский поезд обгонял электропоезд в течение промежутка времени $\Delta t = \frac{s}{v_1}$ с относительной скоростью $v_0 = v_2 - v_1$. Учитывая, что относительное расстояние, которое проехали поезда друг относительно друга, $l = v_0 \Delta t$, из записанных уравнений найдем ответ:</p>
+        <div class="math-scroll">
+          $$v_2 = v_1 \frac{l}{s} + v_1 = 72\text{ }\frac{\text{км}}{\text{ч}}.$$
+        </div>
+        <strong>Ответ:</strong> вариант 2 ($72\text{ км/ч}$).
+      </div>
+    </div>
+
+    <!-- Задача 13 (Решение Рис. 385 -> pic7.png) -->
+    <div class="card" id="task-13">
+      <div class="task-num">Задача 13</div>
+      <div class="task-title">Плот равномерно плывет по реке со скоростью, модуль которой $v_1 = 6{,}0\text{ км/ч}$. Если человек идет поперек плота (перпендикулярно берегу) со скоростью, модуль которой относительно плота $v_2 = 8{,}0\text{ км/ч}$, то модуль скорости $v$ движения человека в системе отсчета, связанной с берегом, равен:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(13, '1', this)">1) $2{,}0\text{ км/ч}$</button>
+        <button class="btn-option" onclick="handleChoice(13, '2', this)">2) $6{,}0\text{ км/ч}$</button>
+        <button class="btn-option" onclick="handleChoice(13, '3', this)">3) $8{,}0\text{ км/ч}$</button>
+        <button class="btn-option" onclick="handleChoice(13, '4', this)">4) $10\text{ км/ч}$</button>
+        <button class="btn-option" onclick="handleChoice(13, '5', this)">5) $14\text{ км/ч}$</button>
+      </div>
+      <div class="status-msg" id="status-13"></div>
+      <button class="btn-solution" id="btn-sol-13" onclick="toggleSolution(13)">Показать Решение</button>
+      <div class="solution-box" id="sol-13">
+        <div class="task-image-box">
+          <img src="pic7.png" alt="Рис. 385" onerror="this.src='https://via.placeholder.com/200x160?text=pic7.png';" />
+          <div class="img-caption">Рис. 385</div>
+        </div>
+        <p>На рисунке 385 показаны: скорость $\vec{v}_1$ плота относительно берега, скорость $\vec{v}_2$ человека относительно плота и скорость $\vec{v}$ человека относительно берега. Из прямоугольного треугольника следует: $v = \sqrt{v_1^2 + v_2^2}$. Подставив данные задачи, получим:</p>
+        <div class="math-scroll">
+          $$v = 10\text{ }\frac{\text{км}}{\text{ч}}.$$
+        </div>
+        <strong>Ответ:</strong> вариант 4 ($10\text{ км/ч}$).
+      </div>
+    </div>
+
+    <!-- Задача 14 (Решение Рис. 386 -> pic8.png) -->
+    <div class="card" id="task-14">
+      <div class="task-num">Задача 14</div>
+      <div class="task-title">Во время миграции антилопы гну переплывают реку Мара шириной $L = 40\text{ м}$, выдерживая курс перпендикулярно течению. Модуль скорости течения воды в реке $v_1 = 1{,}5\text{ м/с}$. Если антилопу снесло вниз по течению на расстояние $l = 30\text{ м}$, то модуль скорости $v$ ее движения относительно берега равен:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(14, '1', this)">1) $1{,}3\text{ м/с}$</button>
+        <button class="btn-option" onclick="handleChoice(14, '2', this)">2) $2{,}0\text{ м/с}$</button>
+        <button class="btn-option" onclick="handleChoice(14, '3', this)">3) $2{,}5\text{ м/с}$</button>
+        <button class="btn-option" onclick="handleChoice(14, '4', this)">4) $3{,}0\text{ м/с}$</button>
+        <button class="btn-option" onclick="handleChoice(14, '5', this)">5) $3{,}6\text{ м/с}$</button>
+      </div>
+      <div class="status-msg" id="status-14"></div>
+      <button class="btn-solution" id="btn-sol-14" onclick="toggleSolution(14)">Показать Решение</button>
+      <div class="solution-box" id="sol-14">
+        <div class="task-image-box">
+          <img src="pic8.png" alt="Рис. 386" onerror="this.src='https://via.placeholder.com/200x200?text=pic8.png';" />
+          <div class="img-caption">Рис. 386</div>
+        </div>
+        <p>На рисунке 386 показаны: скорость $\vec{v}_1$ воды в реке, скорость $\vec{v}$ антилопы относительно берега и скорость $\vec{v}_0$ антилопы относительно воды. Из подобных прямоугольных треугольников следует:</p>
+        <div class="math-scroll">
+          $$\frac{v_1}{v} = \frac{l}{\sqrt{L^2 + l^2}}.$$
+        </div>
+        <p>Отсюда найдем ответ:</p>
+        <div class="math-scroll">
+          $$v = 2{,}5\text{ }\frac{\text{м}}{\text{с}}.$$
+        </div>
+        <strong>Ответ:</strong> вариант 3 ($2{,}5\text{ м/с}$).
+      </div>
+    </div>
+
+    <!-- Задача 15 (Решение Рис. 388 -> pic9.png) -->
+    <div class="card" id="task-15">
+      <div class="task-num">Задача 15</div>
+      <div class="task-title">В безветренную погоду капли дождя оставляют на окне равномерно движущегося автобуса следы, составляющие с горизонтом угол $\varphi = 60^\circ$. Если модуль скорости движения автобуса $v_1 = 18\text{ м/с}$, то модуль скорости $v_0$ движения капель относительно автобуса равен:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(15, '1', this)">1) $9{,}0\text{ м/с}$</button>
+        <button class="btn-option" onclick="handleChoice(15, '2', this)">2) $18\text{ м/с}$</button>
+        <button class="btn-option" onclick="handleChoice(15, '3', this)">3) $24\text{ м/с}$</button>
+        <button class="btn-option" onclick="handleChoice(15, '4', this)">4) $30\text{ м/с}$</button>
+        <button class="btn-option" onclick="handleChoice(15, '5', this)">5) $36\text{ м/с}$</button>
+      </div>
+      <div class="status-msg" id="status-15"></div>
+      <button class="btn-solution" id="btn-sol-15" onclick="toggleSolution(15)">Показать Решение</button>
+      <div class="solution-box" id="sol-15">
+        <div class="task-image-box">
+          <img src="pic9.png" alt="Рис. 388" onerror="this.src='https://via.placeholder.com/200x200?text=pic9.png';" />
+          <div class="img-caption">Рис. 388</div>
+        </div>
+        <p>На рисунке 388 показаны: скорость $\vec{v}_1$ движения автобуса, скорость $\vec{v}$ капель относительно поверхности земли и скорость $\vec{v}_0$ капель относительно автобуса. Из прямоугольного треугольника следует:</p>
+        <div class="math-scroll">
+          $$v_0 = \frac{v_1}{\cos\varphi}.$$
+        </div>
+        <p>Подставив данные задачи, получим:</p>
+        <div class="math-scroll">
+          $$v_0 = 36\text{ }\frac{\text{м}}{\text{с}}.$$
+        </div>
+        <strong>Ответ:</strong> вариант 5 ($36\text{ м/с}$).
+      </div>
+    </div>
+
+    <!-- Задача 16 -->
+    <div class="card" id="task-16">
+      <div class="task-num">Задача 16</div>
+      <div class="task-title">Первую часть пути $s_1 = 69\text{ км}$ автомобиль проехал за промежуток времени $\Delta t_1 = 1{,}0\text{ ч}$. Если остальную часть пути, двигаясь со скоростью, модуль которой $v_2 = 102\text{ км/ч}$, он проехал за промежуток времени $\Delta t_2 = 30\text{ мин}$, то средняя скорость $\langle v \rangle$ движения автомобиля на всем пути равна:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(16, '1', this)">1) $80\text{ км/ч}$</button>
+        <button class="btn-option" onclick="handleChoice(16, '2', this)">2) $84\text{ км/ч}$</button>
+        <button class="btn-option" onclick="handleChoice(16, '3', this)">3) $86\text{ км/ч}$</button>
+        <button class="btn-option" onclick="handleChoice(16, '4', this)">4) $88\text{ км/ч}$</button>
+        <button class="btn-option" onclick="handleChoice(16, '5', this)">5) $90\text{ км/ч}$</button>
+      </div>
+      <div class="status-msg" id="status-16"></div>
+      <button class="btn-solution" id="btn-sol-16" onclick="toggleSolution(16)">Показать Решение</button>
+      <div class="solution-box" id="sol-16">
+        <p>Вторая часть пути автомобиля $s_2 = v_2 \Delta t_2$. Средняя скорость движения автомобиля на всем пути:</p>
+        <div class="math-scroll">
+          $$\langle v \rangle = \frac{s_1 + s_2}{\Delta t_1 + \Delta t_2} = 80\text{ }\frac{\text{км}}{\text{ч}}.$$
+        </div>
+        <strong>Ответ:</strong> вариант 1 ($80\text{ км/ч}$).
+      </div>
+    </div>
+
+    <!-- Задача 17 -->
+    <div class="card" id="task-17">
+      <div class="task-num">Задача 17</div>
+      <div class="task-title">Если электропоезд «Stadler» первую половину пути ехал равномерно и прямолинейно со скоростью, модуль которой $v_1 = 120\text{ км/ч}$, а вторую — со скоростью, модуль которой $v_2 = 80\text{ км/ч}$, то средняя скорость $\langle v \rangle$ электропоезда на всем пути равна:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(17, '1', this)">1) $94\text{ км/ч}$</button>
+        <button class="btn-option" onclick="handleChoice(17, '2', this)">2) $96\text{ км/ч}$</button>
+        <button class="btn-option" onclick="handleChoice(17, '3', this)">3) $100\text{ км/ч}$</button>
+        <button class="btn-option" onclick="handleChoice(17, '4', this)">4) $102\text{ км/ч}$</button>
+        <button class="btn-option" onclick="handleChoice(17, '5', this)">5) $106\text{ км/ч}$</button>
+      </div>
+      <div class="status-msg" id="status-17"></div>
+      <button class="btn-solution" id="btn-sol-17" onclick="toggleSolution(17)">Показать Решение</button>
+      <div class="solution-box" id="sol-17">
+        <p>Первую половину пути электропоезд проехал за промежуток времени $\Delta t_1 = \frac{s}{2v_1}$, вторую — за промежуток времени $\Delta t_2 = \frac{s}{2v_2}$, где $s$ — весь путь. Средняя скорость движения электропоезда на всем пути:</p>
+        <div class="math-scroll">
+          $$\langle v \rangle = \frac{s}{\Delta t_1 + \Delta t_2}, \quad \text{или} \quad \langle v \rangle = \frac{2v_1 v_2}{v_1 + v_2} = 96\text{ }\frac{\text{км}}{\text{ч}}.$$
+        </div>
+        <strong>Ответ:</strong> вариант 2 ($96\text{ км/ч}$).
+      </div>
+    </div>
+
+    <!-- Задача 18 (Решение Рис. 389 -> pic10.png) -->
+    <div class="card" id="task-18">
+      <div class="task-num">Задача 18</div>
+      <div class="task-title">Автомобиль в течение промежутка времени $\Delta t_1 = 40{,}0\text{ мин}$ двигался на север со скоростью, модуль которой $v_1 = 60{,}0\text{ км/ч}$. Затем он повернул на восток и проехал путь $s_2 = 60{,}0\text{ км}$. После этого автомобиль снова повернул на север и еще проехал путь $s_3 = 40{,}0\text{ км}$. Модуль перемещения $\Delta r$ автомобиля за все время движения равен ... км.</div>
+      <div class="task-desc">Введите модуль перемещения в километрах ($\text{км}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-18-input" />
+        <button class="btn-main" onclick="validateCalculation(18)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-18"></div>
+      <button class="btn-solution" id="btn-sol-18" onclick="toggleSolution(18)">Показать Решение</button>
+      <div class="solution-box" id="sol-18">
+        <div class="task-image-box">
+          <img src="pic10.png" alt="Рис. 389" onerror="this.src='https://via.placeholder.com/200x200?text=pic10.png';" />
+          <div class="img-caption">Рис. 389</div>
+        </div>
+        <p>Из прямоугольного треугольника $ABC$ (рис. 389) следует, что модуль перемещения автомобиля:</p>
+        <div class="math-scroll">
+          $$\Delta r = \sqrt{(\Delta r_1 + \Delta r_3)^2 + \Delta r_2^2},$$
+        </div>
+        <p>где $\Delta r_1 = v_1 \Delta t_1 = 40\text{ км}$, $\Delta r_2 = s_2$, $\Delta r_3 = s_3$. Из записанных уравнений найдем ответ:</p>
+        <div class="math-scroll">
+          $$\Delta r = 100\text{ км}.$$
+        </div>
+        <strong>Ответ:</strong> $100\text{ км}$.
+      </div>
+    </div>
+
+    <!-- Задача 19 -->
+    <div class="card" id="task-19">
+      <div class="task-num">Задача 19</div>
+      <div class="task-title">По шоссе равномерно и прямолинейно движется длинная колонна автомобилей. Расстояния между соседними автомобилями одинаковы. Движущийся в том же направлении мотоциклист обнаружил, что если модуль его скорости равномерного движения $v_1 = 36\text{ км/ч}$, то через каждый промежуток времени $\Delta t_1 = 10\text{ с}$ его обгоняет автомобиль из колонны, а при равномерном движении со скоростью, модуль которой $v_2 = 90\text{ км/ч}$, через каждый промежуток времени $\Delta t_2 = 20\text{ с}$ он обгоняет автомобиль из колонны. Если мотоциклист остановится, то автомобили из колонны будут проезжать мимо него через промежутки времени $\Delta t$, равные ... с.</div>
+      <div class="task-desc">Введите промежуток времени в секундах ($\text{с}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-19-input" />
+        <button class="btn-main" onclick="validateCalculation(19)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-19"></div>
+      <button class="btn-solution" id="btn-sol-19" onclick="toggleSolution(19)">Показать Решение</button>
+      <div class="solution-box" id="sol-19">
+        <p><strong>Составление уравнений движения</strong></p>
+        <p><strong>Случай 1:</strong> Мотоциклист едет со скоростью $v_1$, и автомобили его обгоняют. Это значит, что скорость колонны больше скорости мотоциклиста ($v > v_1$). Скорость автомобилей относительно мотоциклиста равна $(v - v_1)$. За время $\Delta t_1 = 10\text{ с}$ автомобиль успевает сократить и преодолеть расстояние $L$:</p>
+        <div class="math-scroll">
+          $$L = (v - v_1) \cdot \Delta t_1$$
+        </div>
+        <p><strong>Случай 2:</strong> Мотоциклист едет со скоростью $v_2$ и сам обгоняет автомобили колонны ($v_2 > v$). Скорость мотоциклиста относительно автомобилей равна $(v_2 - v)$. За время $\Delta t_2 = 20\text{ с}$ он проезжает расстояние $L$ от одного автомобиля до другого:</p>
+        <div class="math-scroll">
+          $$L = (v_2 - v) \cdot \Delta t_2$$
+        </div>
+        <p>Так как расстояние $L$ между машинами одинаково, приравняем правые части уравнений:</p>
+        <div class="math-scroll">
+          $$(v - v_1) \cdot \Delta t_1 = (v_2 - v) \cdot \Delta t_2$$
+        </div>
+        <p>Подставим числовые значения:</p>
+        <div class="math-scroll">
+          $$(v - 10) \cdot 10 = (25 - v) \cdot 20$$
+          $$3v = 60 \implies v = 20\text{ м/с}$$
+        </div>
+        <p>Теперь найдем расстояние $L$, подставив $v$ в первое уравнение:</p>
+        <div class="math-scroll">
+          $$L = (20 - 10) \cdot 10 = 100\text{ м}$$
+        </div>
+        <p>Если мотоциклист остановится, его скорость будет равна нулю. Автомобили будут проезжать мимо него со своей собственной скоростью $v$, преодолевая расстояние $L$ за искомый промежуток времени $\Delta t$:</p>
+        <div class="math-scroll">
+          $$L = v \cdot \Delta t \implies \Delta t = \frac{L}{v}$$
+          $$\Delta t = \frac{100\text{ м}}{20\text{ м/с}} = 5\text{ с}$$
+        </div>
+        <strong>Ответ:</strong> $5\text{ с}$.
+      </div>
+    </div>
+
+    <!-- Задача 20 (Рис. 6 -> pic5.png) -->
+    <div class="card" id="task-20">
+      <div class="task-num">Задача 20</div>
+      <div class="task-title">На рисунке 6 представлены графики движения вдоль оси $Ox$ автомобиля (график I) и мотоцикла (график II). Модуль скорости $v_{12}$ движения автомобиля относительно мотоцикла равен ... м/с.</div>
+      <div class="task-image-box">
+        <img src="pic5.png" alt="Рис. 6" onerror="this.src='https://via.placeholder.com/350x220?text=pic5.png';" />
+        <div class="img-caption">Рис. 6</div>
+      </div>
+      <div class="task-desc">Введите модуль относительной скорости в метрах в секунду ($\text{м/с}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-20-input" />
+        <button class="btn-main" onclick="validateCalculation(20)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-20"></div>
+      <button class="btn-solution" id="btn-sol-20" onclick="toggleSolution(20)">Показать Решение</button>
+      <div class="solution-box" id="sol-20">
+        <p>Используя график (рис. 6), найдем проекции скорости движения автомобиля и мотоцикла: $v_{\text{I}x} = 20\text{ }\frac{\text{м}}{\text{с}}$ и $v_{\text{II}x} = -10\text{ }\frac{\text{м}}{\text{с}}$.</p>
+        <p>Так как автомобиль и мотоцикл движутся навстречу друг другу, то:</p>
+        <div class="math-scroll">
+          $$v_{12} = |v_{\text{I}x}| + |v_{\text{II}x}| = 30\text{ }\frac{\text{м}}{\text{с}}.$$
+        </div>
+        <strong>Ответ:</strong> $30\text{ м/с}$.
+      </div>
+    </div>
+
+    <!-- Задача 21 -->
+    <div class="card" id="task-21">
+      <div class="task-num">Задача 21</div>
+      <div class="task-title">Если расстояние между двумя лодочными станциями моторная лодка (при неизменной мощности двигателя) проплывает по течению реки за промежуток времени $\Delta t_1 = 20\text{ мин}$, а против течения — за промежуток времени $\Delta t_2 = 30\text{ мин}$, то промежуток времени $\Delta t$, за который такое же расстояние лодка проплывает в стоячей воде, равен ... мин.</div>
+      <div class="task-desc">Введите время в минутах ($\text{мин}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-21-input" />
+        <button class="btn-main" onclick="validateCalculation(21)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-21"></div>
+      <button class="btn-solution" id="btn-sol-21" onclick="toggleSolution(21)">Показать Решение</button>
+      <div class="solution-box" id="sol-21">
+        <p>Пусть расстояние между лодочными станциями равно $l$, модуль скорости движения лодки относительно воды $v_1$, модуль скорости течения воды $v_2$. Тогда выполняются равенства: $l = (v_1 + v_2)\Delta t_1$, $l = (v_1 - v_2)\Delta t_2$, $l = v_1 \Delta t$. Из записанных уравнений найдем ответ:</p>
+        <div class="math-scroll">
+          $$\Delta t = \frac{2\Delta t_1 \Delta t_2}{\Delta t_1 + \Delta t_2} = 24\text{ мин}.$$
+        </div>
+        <strong>Ответ:</strong> $24\text{ мин}$.
+      </div>
+    </div>
+
+    <!-- Задача 22 (Рис. 7 -> pic6.png) -->
+    <div class="card" id="task-22">
+      <div class="task-num">Задача 22</div>
+      <div class="task-title">При переправе на моторной лодке через реку шириной $h = 60\text{ м}$ лодочнику надо попасть из точки $A$ в точку $B$ (рис. 7). Расстояние $l = 80\text{ м}$. Лодочник управляет лодкой так, что она движется вдоль прямой $AB$ со скоростью, модуль которой относительно берега $v = 8\text{ }\frac{\text{м}}{\text{с}}$. Если модуль скорости течения воды $v_{\text{т}} = 2{,}8\text{ }\frac{\text{м}}{\text{с}}$, то модуль скорости лодки $v_0$ относительно воды равен ... м/с.</div>
+      <div class="task-image-box">
+        <img src="pic6.png" alt="Рис. 7" onerror="this.src='https://via.placeholder.com/350x200?text=pic6.png';" />
+        <div class="img-caption">Рис. 7</div>
+      </div>
+      <div class="task-desc">Введите скорость лодки относительно воды в метрах в секунду ($\text{м/с}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-22-input" />
+        <button class="btn-main" onclick="validateCalculation(22)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-22"></div>
+      <button class="btn-solution" id="btn-sol-22" onclick="toggleSolution(22)">Показать Решение</button>
+      <div class="solution-box" id="sol-22">
+        <p>По закону сложения скоростей скорость лодки относительно берега равна векторной сумме скорости лодки относительно воды и скорости течения:</p>
+        <div class="math-scroll">
+          $$\vec{v} = \vec{v}_0 + \vec{v}_{\text{т}} \implies \vec{v}_0 = \vec{v} - \vec{v}_{\text{т}}.$$
+        </div>
+        <p>Косинус угла $\alpha$ между направлением движения лодки вдоль прямой $AB$ и берегом (направлением течения):</p>
+        <div class="math-scroll">
+          $$\cos\alpha = \frac{l}{\sqrt{h^2 + l^2}} = \frac{80}{\sqrt{60^2 + 80^2}} = \frac{80}{100} = 0{,}8.$$
+        </div>
+        <p>По теореме косинусов для вектора относительной скорости $\vec{v}_0$:</p>
+        <div class="math-scroll">
+          $$v_0 = \sqrt{v^2 + v_{\text{т}}^2 - 2 v v_{\text{т}} \cos\alpha} = \sqrt{8^2 + 2{,}8^2 - 2 \cdot 8 \cdot 2{,}8 \cdot 0{,}8} = \sqrt{64 + 7{,}84 - 35{,}84} = \sqrt{36} = 6\text{ }\frac{\text{м}}{\text{с}}.$$
+        </div>
+        <strong>Ответ:</strong> $6\text{ м/с}$.
+      </div>
+    </div>
+
+    <!-- Задача 23 (Решение Рис. 391 -> pic11.png) -->
+    <div class="card" id="task-23">
+      <div class="task-num">Задача 23</div>
+      <div class="task-title">В безветренную погоду беспилотный самолет летел точно на север со скоростью, модуль которой $v_1 = 8\text{ }\frac{\text{м}}{\text{с}}$. Затем подул северо-западный ветер под углом $\alpha = 60^\circ$ к меридиану. Если модуль скорости ветра $v_2 = 3\text{ }\frac{\text{м}}{\text{с}}$, то модуль скорости $v$ движения самолета относительно земли при ветре равен ... м/с.</div>
+      <div class="task-desc">Введите скорость относительно земли в метрах в секунду ($\text{м/с}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-23-input" />
+        <button class="btn-main" onclick="validateCalculation(23)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-23"></div>
+      <button class="btn-solution" id="btn-sol-23" onclick="toggleSolution(23)">Показать Решение</button>
+      <div class="solution-box" id="sol-23">
+        <div class="task-image-box">
+          <img src="pic11.png" alt="Рис. 391" onerror="this.src='https://via.placeholder.com/200x200?text=pic11.png';" />
+          <div class="img-caption">Рис. 391</div>
+        </div>
+        <p>На рисунке 391 показаны скорость $\vec{v}_1$ беспилотного самолета относительно воздуха, скорость $\vec{v}_2$ ветра относительно земли и скорость $\vec{v}$ самолета относительно земли. Используя теорему косинусов, найдем ответ:</p>
+        <div class="math-scroll">
+          $$v = \sqrt{v_1^2 + v_2^2 - 2v_1 v_2 \cos\alpha} = 7\text{ }\frac{\text{м}}{\text{с}}.$$
+        </div>
+        <strong>Ответ:</strong> $7\text{ м/с}$.
+      </div>
+    </div>
+
+    <!-- Задача 24 (из допов, №3) -->
+    <div class="card" id="task-24">
+      <div class="task-num">Задача 24</div>
+      <div class="task-title">Координата $x$ материальной точки изменяется по закону $x = 2 - 4t\text{ (м)}$. Путь, пройденный точкой за время $t = 5\text{ с}$, отличается от модуля координаты точки в этот же момент времени на ... м.</div>
+      <div class="task-desc">Введите значение разности в метрах ($\text{м}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-24-input" />
+        <button class="btn-main" onclick="validateCalculation(24)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-24"></div>
+      <button class="btn-solution" id="btn-sol-24" onclick="toggleSolution(24)">Показать Решение</button>
+      <div class="solution-box" id="sol-24">
+        <ol>
+          <li><strong>Основная формула пути для равномерного движения:</strong> $S = v \cdot t$.<br/>
+            Из уравнения $x = 2 - 4t$ видно, что модуль скорости точки равен $v = 4\text{ м/с}$.<br/>
+            Путь за время $t = 5\text{ с}$:
+            <div class="math-scroll">
+              $$S = 4 \cdot 5 = 20\text{ м}$$
+            </div>
+          </li>
+          <li><strong>Координата точки в момент времени $t = 5\text{ с}$ :</strong>
+            <div class="math-scroll">
+              $$x = 2 - 4 \cdot 5 = -18\text{ м}$$
+            </div>
+            Модуль этой координаты: $|x| = 18\text{ м}$.
+          </li>
+          <li><strong>Разность между пройденным путем и модулем координаты:</strong>
+            <div class="math-scroll">
+              $$\Delta = S - |x| = 20 - 18 = 2\text{ м}$$
+            </div>
+          </li>
+        </ol>
+        <strong>Ответ:</strong> на $2\text{ м}$.
+      </div>
+    </div>
+
+    <!-- Задача 25 (из допов, №4) -->
+    <div class="card" id="task-25">
+      <div class="task-num">Задача 25</div>
+      <div class="task-title">Человек поднимается по неподвижному эскалатору за время $t_1 = 3\text{ мин}$, а по движущемуся вверх эскалатору — за $t_2 = 2\text{ мин}$. По эскалатору, движущемуся с той же скоростью вниз, человек поднимется за ... мин.</div>
+      <div class="task-desc">Введите время в минутах ($\text{мин}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-25-input" />
+        <button class="btn-main" onclick="validateCalculation(25)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-25"></div>
+      <button class="btn-solution" id="btn-sol-25" onclick="toggleSolution(25)">Показать Решение</button>
+      <div class="solution-box" id="sol-25">
+        <p>Пусть $L$ — длина эскалатора, $v_{\text{ч}}$ — скорость человека, $v_{\text{э}}$ — скорость эскалатора, а $t_3$ — искомое время.</p>
+        <p>Запишем <strong>основную формулу связи пути, скорости и времени ($L = v \cdot t$)</strong> для всех трех случаев:</p>
+        <ol>
+          <li>Подъем по неподвижному эскалатору:
+            <div class="math-scroll">
+              $$L = v_{\text{ч}} \cdot t_1 \implies v_{\text{ч}} = \frac{L}{t_1}$$
+            </div>
+          </li>
+          <li>Подъем по эскалатору вверх (скорости складываются):
+            <div class="math-scroll">
+              $$L = (v_{\text{ч}} + v_{\text{э}}) \cdot t_2$$
+            </div>
+          </li>
+          <li>Подъем по эскалатору вниз (скорости вычитаются):
+            <div class="math-scroll">
+              $$L = (v_{\text{ч}} - v_{\text{э}}) \cdot t_3$$
+            </div>
+          </li>
+        </ol>
+        <p><strong>Работа с уравнениями (1) и (2)</strong></p>
+        <p>Подставим полученное выражение для скорости человека $v_{\text{ч}}$ во второе уравнение:</p>
+        <div class="math-scroll">
+          $$L = \left(\frac{L}{t_1} + v_{\text{э}}\right) \cdot t_2$$
+        </div>
+        <p>Разделим обе части этого уравнения на время $t_2$:</p>
+        <div class="math-scroll">
+          $$\frac{L}{t_2} = \frac{L}{t_1} + v_{\text{э}}$$
+        </div>
+        <p>Теперь выразим из этого соотношения скорость эскалатора $v_{\text{э}}$:</p>
+        <div class="math-scroll">
+          $$v_{\text{э}} = \frac{L}{t_2} - \frac{L}{t_1}$$
+        </div>
+        <p><strong>Работа с уравнениями (1) и (3)</strong></p>
+        <p>Подставим выражение для скорости человека $v_{\text{ч}}$ в третье уравнение:</p>
+        <div class="math-scroll">
+          $$L = \left(\frac{L}{t_1} - v_{\text{э}}\right) \cdot t_3$$
+        </div>
+        <p>Разделим обе части уравнения на время $t_3$:</p>
+        <div class="math-scroll">
+          $$\frac{L}{t_3} = \frac{L}{t_1} - v_{\text{э}}$$
+        </div>
+        <p><strong>Объединение полученных выражений</strong></p>
+        <p>Подставим найденную ранее скорость эскалатора $v_{\text{э}}$ в уравнение, полученное на предыдущем этапе:</p>
+        <div class="math-scroll">
+          $$\frac{L}{t_3} = \frac{L}{t_1} - \left(\frac{L}{t_2} - \frac{L}{t_1}\right)$$
+        </div>
+        <p>Раскроем скобки в правой части:</p>
+        <div class="math-scroll">
+          $$\frac{L}{t_3} = \frac{L}{t_1} - \frac{L}{t_2} + \frac{L}{t_1}$$
+        </div>
+        <p>Приведем подобные слагаемые:</p>
+        <div class="math-scroll">
+          $$\frac{L}{t_3} = \frac{2L}{t_1} - \frac{L}{t_2}$$
+        </div>
+        <p>Разделим обе части итогового уравнения на общую длину эскалатора $L$:</p>
+        <div class="math-scroll">
+          $$\frac{1}{t_3} = \frac{2}{t_1} - \frac{1}{t_2}$$
+        </div>
+        <p><strong>Расчет конечного времени</strong></p>
+        <p>Приведем дроби в правой части к общему знаменателю:</p>
+        <div class="math-scroll">
+          $$\frac{1}{t_3} = \frac{2t_2 - t_1}{t_1 \cdot t_2}$$
+        </div>
+        <p>Перевернем полученную дробь, чтобы выразить искомое время $t_3$:</p>
+        <div class="math-scroll">
+          $$t_3 = \frac{t_1 \cdot t_2}{2t_2 - t_1}$$
+        </div>
+        <p>Подставим в эту формулу численные значения из условия задачи ($t_1 = 3\text{ мин}$, $t_2 = 2\text{ мин}$):</p>
+        <div class="math-scroll">
+          $$t_3 = \frac{3 \cdot 2}{2 \cdot 2 - 3} = \frac{6}{4 - 3} = 6\text{ мин}$$
+        </div>
+        <strong>Ответ:</strong> $6\text{ мин}$.
+      </div>
+    </div>
+
+    <!-- Задача 26 (из допов, В1) -->
+    <div class="card" id="task-26">
+      <div class="task-num">Задача 26</div>
+      <div class="task-title">Спортсмен пробежал первую часть дистанции $s_1 = 25\text{ км}$ за время $t_1 = 2{,}5\text{ ч}$, а вторую часть дистанции $s_2 = 35\text{ км}$ проехал на велосипеде за время $t_2 = 1{,}5\text{ ч}$. Средняя скорость $\langle v \rangle$ спортсмена на всей дистанции равна ... $\frac{\text{км}}{\text{ч}}$.</div>
+      <div class="task-desc">Введите среднюю скорость в километрах в час ($\text{км/ч}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-26-input" />
+        <button class="btn-main" onclick="validateCalculation(26)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-26"></div>
+      <button class="btn-solution" id="btn-sol-26" onclick="toggleSolution(26)">Показать Решение</button>
+      <div class="solution-box" id="sol-26">
+        <p>Запишем <strong>основную формулу средней путевой скорости</strong>, которая равна отношению всего пройденного пути ко всему затраченному времени:</p>
+        <div class="math-scroll">
+          $$\langle v \rangle = \frac{s_{\text{весь}}}{t_{\text{все}}}$$
+        </div>
+        <p>Выразим весь пройденный путь $s_{\text{весь}}$ как сумму двух участков дистанции:</p>
+        <div class="math-scroll">
+          $$s_{\text{весь}} = s_1 + s_2$$
+        </div>
+        <p>Выразим все затраченное время $t_{\text{все}}$ как сумму промежутков времени на каждом участке:</p>
+        <div class="math-scroll">
+          $$t_{\text{все}} = t_1 + t_2$$
+        </div>
+        <p>Подставим полученные выражения для пути и времени в основную формулу средней скорости:</p>
+        <div class="math-scroll">
+          $$\langle v \rangle = \frac{s_1 + s_2}{t_1 + t_2}$$
+        </div>
+        <p>Подставим числовые значения из условия задачи ($s_1 = 25\text{ км}$, $t_1 = 2{,}5\text{ ч}$, $s_2 = 35\text{ км}$, $t_2 = 1{,}5\text{ ч}$) в итоговое выражение:</p>
+        <div class="math-scroll">
+          $$\langle v \rangle = \frac{25 + 35}{2{,}5 + 1{,}5} = \frac{60}{4} = 15\text{ км/ч}$$
+        </div>
+        <strong>Ответ:</strong> $15\text{ км/ч}$.
+      </div>
+    </div>
+
+    <!-- Задача 27 (из допов, №125) -->
+    <div class="card" id="task-27">
+      <div class="task-num">Задача 27</div>
+      <div class="task-title">Грузовой поезд, проехав путь $s_1 = 140\text{ км}$ со средней скоростью $\langle v_1 \rangle = 60\text{ }\frac{\text{км}}{\text{ч}}$, остановился на время $t = 20\text{ мин}$. Оставшуюся часть пути $s_2 = 96\text{ км}$ он проехал со средней скоростью $\langle v_2 \rangle = 72\text{ }\frac{\text{км}}{\text{ч}}$. Определите среднюю скорость движения поезда на всем пути.</div>
+      <div class="task-desc">Введите среднюю скорость в километрах в час ($\text{км/ч}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-27-input" />
+        <button class="btn-main" onclick="validateCalculation(27)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-27"></div>
+      <button class="btn-solution" id="btn-sol-27" onclick="toggleSolution(27)">Показать Решение</button>
+      <div class="solution-box" id="sol-27">
+        <p><strong>Весь путь:</strong></p>
+        <div class="math-scroll">
+          $$s = s_1 + s_2 = 140 + 96 = 236\text{ км}$$
+        </div>
+        <p><strong>Время движения на участках:</strong></p>
+        <ul>
+          <li>Первый: $t_1 = \frac{s_1}{v_1} = \frac{140}{60} = \frac{7}{3}\text{ ч}$</li>
+          <li>Стоянка: $t_{\text{ст}} = 20\text{ мин} = \frac{1}{3}\text{ ч}$</li>
+          <li>Второй: $t_2 = \frac{s_2}{v_2} = \frac{96}{72} = \frac{4}{3}\text{ ч}$</li>
+        </ul>
+        <p><strong>Все время:</strong></p>
+        <div class="math-scroll">
+          $$t = t_1 + t_{\text{ст}} + t_2 = \frac{7}{3} + \frac{1}{3} + \frac{4}{3} = \frac{12}{3} = 4\text{ ч}$$
+        </div>
+        <p><strong>Средняя скорость:</strong></p>
+        <div class="math-scroll">
+          $$\langle v \rangle = \frac{s}{t} = \frac{236}{4} = 59\text{ км/ч}$$
+        </div>
+        <strong>Ответ:</strong> $59\text{ км/ч}$.
+      </div>
+    </div>
+
+    <!-- Задача 28 (из допов, №127) -->
+    <div class="card" id="task-28">
+      <div class="task-num">Задача 28</div>
+      <div class="task-title">Путь $s_1 = 5{,}4\text{ км}$ от дачи до станции дачник прошел со скоростью $v_1 = 6{,}0\text{ }\frac{\text{км}}{\text{ч}}$. Далее он ехал на электричке, средняя скорость которой $\langle v_2 \rangle = 50\text{ }\frac{\text{км}}{\text{ч}}$. Определите путь, который проехал дачник на электричке, если средняя скорость движения дачника на всем пути $\langle v \rangle = 32\text{ }\frac{\text{км}}{\text{ч}}$.</div>
+      <div class="task-desc">Введите путь на электричке в километрах ($\text{км}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-28-input" />
+        <button class="btn-main" onclick="validateCalculation(28)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-28"></div>
+      <button class="btn-solution" id="btn-sol-28" onclick="toggleSolution(28)">Показать Решение</button>
+      <div class="solution-box" id="sol-28">
+        <p>Запишем основную формулу времени для первого участка пути:</p>
+        <div class="math-scroll">
+          $$t_1 = \frac{s_1}{v_1}$$
+        </div>
+        <p>Подставим известные значения ($s_1 = 5{,}4\text{ км}$, $v_1 = 6{,}0\text{ км/ч}$) и найдем время, которое дачник шел пешком до станции:</p>
+        <div class="math-scroll">
+          $$t_1 = \frac{5{,}4}{6{,}0} = 0{,}9\text{ ч}$$
+        </div>
+        <p>Запишем основную формулу связи пути, скорости и времени для второго участка (поездки на электричке):</p>
+        <div class="math-scroll">
+          $$t_2 = \frac{s_2}{\langle v_2 \rangle}$$
+        </div>
+        <p>Подставим известную среднюю скорость электрички ($\langle v_2 \rangle = 50\text{ км/ч}$):</p>
+        <div class="math-scroll">
+          $$t_2 = \frac{s_2}{50}$$
+        </div>
+        <p>Запишем базовое определение средней скорости на всем пути движения:</p>
+        <div class="math-scroll">
+          $$\langle v \rangle = \frac{s_{\text{весь}}}{t_{\text{все}}} = \frac{s_1 + s_2}{t_1 + t_2}$$
+          $$32 = \frac{5{,}4 + s_2}{0{,}9 + \frac{s_2}{50}}$$
+        </div>
+        <p><strong>После математических преобразований:</strong></p>
+        <div class="math-scroll">
+          $$s_2 = \frac{23{,}4}{0{,}36} = 20\text{ км}$$
+        </div>
+        <strong>Ответ:</strong> $20\text{ км}$.
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Рендеринг формул KaTeX
+    function initMath() {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "$", right: "$", display: false }
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    const correctAnswers = {
+      1: ['1'],
+      2: ['4'],
+      3: ['1'],
+      4: ['5'],
+      5: ['5'],
+      6: ['2'],
+      7: ['5'],
+      8: ['4'],
+      9: ['5'],
+      10: ['1'],
+      11: ['2'],
+      12: ['2'],
+      13: ['4'],
+      14: ['3'],
+      15: ['5'],
+      16: ['1'],
+      17: ['2']
+    };
+
+    function handleChoice(taskId, value, buttonEl) {
+      const card = document.getElementById(`task-${taskId}`);
+      const buttons = card.querySelectorAll('.btn-option');
+      const status = document.getElementById(`status-${taskId}`);
+      const btnSol = document.getElementById(`btn-sol-${taskId}`);
+
+      buttons.forEach(b => b.classList.remove('correct', 'incorrect'));
+
+      const isCorrect = correctAnswers[taskId] && correctAnswers[taskId].includes(value);
+
+      if (isCorrect) {
+        buttonEl.classList.add('correct');
+        status.className = 'status-msg correct';
+        status.innerHTML = '✓ Верно! Отличная работа.';
+        btnSol.style.display = 'none';
+      } else {
+        buttonEl.classList.add('incorrect');
+        status.className = 'status-msg incorrect';
+        status.innerHTML = '✕ Неверно. Попробуйте еще раз или посмотрите решение.';
+        btnSol.style.display = 'inline-block';
+      }
+    }
+
+    function parseVal(str) {
+      if (!str) return NaN;
+      let s = str.trim().toLowerCase().replace(/\s+/g, '').replace(',', '.');
+      s = s.replace('·', '*').replace('x', '*').replace('х', '*');
+      s = s.replace(/10\^(\-?\d+)/g, '1e$1');
+      s = s.replace(/\*1e/g, 'e');
+      return parseFloat(s);
+    }
+
+    function validateCalculation(taskId) {
+      const inputEl = document.getElementById(`calc-${taskId}-input`);
+      const val = parseVal(inputEl.value);
+      const status = document.getElementById(`status-${taskId}`);
+      const btnSol = document.getElementById(`btn-sol-${taskId}`);
+      let isCorrect = false;
+
+      if (taskId === 18) isCorrect = Math.abs(val - 100) < 0.5;
+      else if (taskId === 19) isCorrect = Math.abs(val - 5) < 0.1;
+      else if (taskId === 20) isCorrect = Math.abs(val - 30) < 0.5;
+      else if (taskId === 21) isCorrect = Math.abs(val - 24) < 0.5;
+      else if (taskId === 22) isCorrect = Math.abs(val - 6) < 0.2;
+      else if (taskId === 23) isCorrect = Math.abs(val - 7) < 0.2;
+      // Новые задачи из допов:
+      else if (taskId === 24) isCorrect = Math.abs(val - 2) < 0.1;
+      else if (taskId === 25) isCorrect = Math.abs(val - 6) < 0.1;
+      else if (taskId === 26) isCorrect = Math.abs(val - 15) < 0.5;
+      else if (taskId === 27) isCorrect = Math.abs(val - 59) < 0.5;
+      else if (taskId === 28) isCorrect = Math.abs(val - 20) < 0.5;
+
+      if (isCorrect) {
+        status.className = 'status-msg correct';
+        status.innerHTML = '✓ Правильно! Расчет выполнен верно.';
+        btnSol.style.display = 'none';
+      } else {
+        status.className = 'status-msg incorrect';
+        status.innerHTML = '✕ Не сходится. Перепроверьте расчет.';
+        btnSol.style.display = 'inline-block';
+      }
+    }
+
+    function toggleSolution(taskId) {
+      const box = document.getElementById(`sol-${taskId}`);
+      if (box.style.display === 'block') {
+        box.style.display = 'none';
+      } else {
+        box.style.display = 'block';
+        if (window.renderMathInElement) {
+          renderMathInElement(box, {
+            delimiters: [
+              { left: "$$", right: "$$", display: true },
+              { left: "$", right: "$", display: false }
+            ],
+            throwOnError: false
+          });
+        }
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(initMath, 200);
+    });
+  </script>
+</body>
+</html>
