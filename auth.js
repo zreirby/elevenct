@@ -306,7 +306,7 @@ const FIREBASE_CONFIG = {
     overlay.className = "phys-overlay";
     overlay.innerHTML = `
       <div class="phys-modal">
-        <div class="phys-modal-badge">@physarea.ct • Физика</div>
+        <div class="phys-modal-badge">PHYSAREA</div>
         <div id="phys-loading-state">
           <h2>Загрузка...</h2>
           <p style="margin-bottom:0">Проверяем авторизацию</p>
