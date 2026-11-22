@@ -59,17 +59,8 @@
       flex-wrap: wrap;
     }
 
-    .header-left, .header-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .brand {
-      font-size: 16px;
-      font-weight: 800;
-      color: #fff;
-    }
+    .header-left, .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .brand { font-size: 16px; font-weight: 800; color: #fff; }
 
     .btn {
       display: inline-flex;
@@ -88,22 +79,10 @@
       white-space: nowrap;
     }
     .btn:hover { background: rgba(255, 255, 255, 0.13); }
-    .btn-primary {
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-      border-color: transparent;
-      color: #fff;
-    }
-    .btn-danger {
-      background: rgba(244, 63, 94, 0.14);
-      border-color: rgba(244, 63, 94, 0.35);
-      color: #fda4af;
-    }
+    .btn-primary { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border-color: transparent; color: #fff; }
+    .btn-danger { background: rgba(244, 63, 94, 0.14); border-color: rgba(244, 63, 94, 0.35); color: #fda4af; }
 
-    main {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 26px 16px 60px;
-    }
+    main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 60px; }
 
     .denied-box {
       max-width: 460px;
@@ -119,29 +98,68 @@
 
     .stats-row {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
       gap: 14px;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
     .stat-card {
       background: var(--surface-card);
       border: 1px solid var(--border);
       border-radius: 18px;
-      padding: 18px 20px;
+      padding: 16px 18px;
       backdrop-filter: blur(20px);
     }
-    .stat-label {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-sub);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+    .stat-label { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.06em; }
+    .stat-value { font-size: 26px; font-weight: 800; margin-top: 4px; font-family: var(--mono); }
+
+    /* Фильтр по группам */
+    .group-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
     }
-    .stat-value {
-      font-size: 28px;
-      font-weight: 800;
-      margin-top: 4px;
+    .group-tab {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-sub);
+      padding: 9px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s;
+    }
+    .group-tab:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+    .group-tab.active {
+      background: rgba(99, 102, 241, 0.22);
+      border-color: rgba(99, 102, 241, 0.55);
+      color: #ffffff;
+      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.2);
+    }
+    .group-tab.tab-unknow.active {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: rgba(245, 158, 11, 0.55);
+      color: #fde68a;
+    }
+    .tab-count {
       font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Блоки рейтингов по группам */
+    .ratings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
     }
 
     .panel {
@@ -156,68 +174,95 @@
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 10px;
+      margin-bottom: 14px;
     }
-    .panel-title { font-size: 18px; font-weight: 800; }
+    .panel-title { font-size: 17px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
     .panel-hint { font-size: 13px; color: var(--text-sub); }
 
-    .table-wrap {
-      overflow-x: auto;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      -webkit-overflow-scrolling: touch;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 820px;
-      font-size: 13px;
-    }
-    th, td {
-      padding: 11px 10px;
-      border-bottom: 1px solid var(--border);
-      border-right: 1px solid rgba(255, 255, 255, 0.04);
-      text-align: center;
-    }
-    th {
-      background: rgba(15, 20, 32, 0.95);
+    .group-badge {
+      display: inline-block;
       font-size: 11px;
       font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #cbd5e1;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #bae6fd;
       white-space: nowrap;
     }
+    .group-badge.gb-in {
+      background: rgba(168, 85, 247, 0.16);
+      border-color: rgba(168, 85, 247, 0.35);
+      color: #e9d5ff;
+    }
+    .group-badge.gb-unknow {
+      background: rgba(245, 158, 11, 0.16);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #fde68a;
+    }
+
+    /* Строки рейтинга */
+    .rank-list { display: flex; flex-direction: column; gap: 8px; }
+    .rank-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 13px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .rank-row.top-1 {
+      background: linear-gradient(90deg, rgba(250, 204, 21, 0.12), rgba(255, 255, 255, 0.03));
+      border-color: rgba(250, 204, 21, 0.3);
+    }
+    .rank-row.top-2 {
+      background: linear-gradient(90deg, rgba(203, 213, 225, 0.11), rgba(255, 255, 255, 0.03));
+      border-color: rgba(203, 213, 225, 0.25);
+    }
+    .rank-row.top-3 {
+      background: linear-gradient(90deg, rgba(251, 146, 60, 0.11), rgba(255, 255, 255, 0.03));
+      border-color: rgba(251, 146, 60, 0.25);
+    }
+    .rank-left { display: flex; align-items: center; gap: 11px; min-width: 0; }
+    .rank-pos {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-weight: 800;
+      font-size: 13px;
+      background: rgba(255, 255, 255, 0.07);
+      flex-shrink: 0;
+    }
+    .rank-name { font-weight: 700; font-size: 14px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .rank-sub { font-size: 11px; color: var(--text-muted); font-family: var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .rank-metrics { text-align: right; flex-shrink: 0; }
+    .rank-score { font-family: var(--mono); font-weight: 800; font-size: 15px; color: #6ee7b7; }
+    .rank-extra { font-size: 11px; color: var(--text-sub); font-family: var(--mono); }
+
+    /* Таблица ДЗ */
+    .table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; min-width: 820px; font-size: 13px; }
+    th, td { padding: 11px 10px; border-bottom: 1px solid var(--border); border-right: 1px solid rgba(255, 255, 255, 0.04); text-align: center; }
+    th { background: rgba(15, 20, 32, 0.95); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #cbd5e1; white-space: nowrap; }
     th:first-child, td:first-child {
-      position: sticky;
-      left: 0;
-      z-index: 2;
+      position: sticky; left: 0; z-index: 2;
       background: rgba(16, 20, 32, 0.97);
-      text-align: left;
-      padding-left: 14px;
-      min-width: 165px;
+      text-align: left; padding-left: 14px; min-width: 195px;
       border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
     th:first-child { z-index: 3; }
 
-    .student-cell {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-    .student-name { font-weight: 700; color: #fff; }
+    .student-cell { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .student-name { font-weight: 700; color: #fff; font-size: 13px; }
     .student-login { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
-    .edit-name-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      padding: 4px;
-      font-size: 13px;
-    }
+    .edit-name-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 13px; }
     .edit-name-btn:hover { color: #fff; }
 
     .cell-btn {
@@ -225,119 +270,54 @@
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 8px;
-      padding: 6px 6px;
+      padding: 6px;
       color: #e2e8f0;
       font-family: var(--mono);
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
-      transition: transform 0.15s, border-color 0.2s;
     }
-    .cell-btn:hover { transform: translateY(-1px); border-color: rgba(255, 255, 255, 0.25); }
-    .cell-btn.good {
-      background: rgba(16, 185, 129, 0.14);
-      border-color: rgba(16, 185, 129, 0.32);
-      color: #6ee7b7;
-    }
-    .cell-btn.mid {
-      background: rgba(245, 158, 11, 0.13);
-      border-color: rgba(245, 158, 11, 0.32);
-      color: #fcd34d;
-    }
-    .cell-btn.bad {
-      background: rgba(244, 63, 94, 0.13);
-      border-color: rgba(244, 63, 94, 0.32);
-      color: #fda4af;
-    }
+    .cell-btn:hover { border-color: rgba(255, 255, 255, 0.25); }
+    .cell-btn.good { background: rgba(16, 185, 129, 0.14); border-color: rgba(16, 185, 129, 0.32); color: #6ee7b7; }
+    .cell-btn.mid { background: rgba(245, 158, 11, 0.13); border-color: rgba(245, 158, 11, 0.32); color: #fcd34d; }
+    .cell-btn.bad { background: rgba(244, 63, 94, 0.13); border-color: rgba(244, 63, 94, 0.32); color: #fda4af; }
     .cell-empty { color: var(--text-muted); font-family: var(--mono); }
 
-    /* Модальное окно деталей по ДЗ */
     .detail-backdrop {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
+      position: fixed; inset: 0; z-index: 200;
       background: rgba(5, 6, 10, 0.8);
       backdrop-filter: blur(12px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
+      display: none; align-items: center; justify-content: center; padding: 16px;
     }
     .detail-backdrop.open { display: flex; }
     .detail-card {
-      width: 100%;
-      max-width: 640px;
-      max-height: 85vh;
-      display: flex;
-      flex-direction: column;
+      width: 100%; max-width: 640px; max-height: 85vh;
+      display: flex; flex-direction: column;
       background: #121622;
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 22px;
-      overflow: hidden;
+      border-radius: 22px; overflow: hidden;
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
     }
-    .detail-head {
-      padding: 18px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
+    .detail-head { padding: 18px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
     .detail-head h3 { font-size: 18px; font-weight: 800; }
     .detail-sub { font-size: 13px; color: var(--text-sub); margin-top: 2px; }
-    .detail-body {
-      padding: 16px 20px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .detail-foot {
-      padding: 14px 20px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    .detail-body { padding: 16px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .detail-foot { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
 
     .task-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+      padding: 12px 14px; border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border);
     }
     .task-row-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .task-num-tag {
-      font-family: var(--mono);
-      font-weight: 700;
-      font-size: 13px;
-      padding: 4px 9px;
-      border-radius: 8px;
-      background: rgba(99, 102, 241, 0.16);
-      color: #c7d2fe;
-    }
+    .task-num-tag { font-family: var(--mono); font-weight: 700; font-size: 13px; padding: 4px 9px; border-radius: 8px; background: rgba(99, 102, 241, 0.16); color: #c7d2fe; }
     .badge-ok { color: #34d399; font-weight: 700; font-size: 13px; }
     .badge-err { color: #fb7185; font-weight: 700; font-size: 13px; }
-    .badge-warn {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: rgba(245, 158, 11, 0.15);
-      color: #fcd34d;
-    }
-    .task-meta {
-      font-size: 12px;
-      color: var(--text-sub);
-      font-family: var(--mono);
+    .badge-warn { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: rgba(245, 158, 11, 0.15); color: #fcd34d; }
+    .task-meta { font-size: 12px; color: var(--text-sub); font-family: var(--mono); }
+
+    @media (max-width: 520px) {
+      .ratings-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -356,7 +336,7 @@
   </header>
 
   <main id="app-root">
-    <div class="denied-box" id="loading-box">
+    <div class="denied-box">
       <h2>Загрузка...</h2>
       <p>Проверяем права доступа</p>
     </div>
@@ -396,13 +376,27 @@
 
     let DZ_LIST = [...DEFAULT_DZ_LIST];
     let allStudents = [];
+    let selectedGroup = "ALL";
     let activeDetail = null;
 
     function esc(s) {
       return window.PhysAuth ? window.PhysAuth.escapeHtml(s) : String(s ?? "");
     }
 
-    // Автоматически собираем актуальный список ДЗ из index.html и из ответов учеников
+    function getGroupBadgeClass(groupKey) {
+      if (groupKey === "IN") return "group-badge gb-in";
+      if (groupKey === "UNKNOW") return "group-badge gb-unknow";
+      return "group-badge";
+    }
+
+    function formatStudentPrimaryName(st) {
+      if (st.displayName) return st.displayName;
+      if (st.parsed?.valid) {
+        return `Ученик №${Number(st.parsed.studentNum)} (${st.parsed.code})`;
+      }
+      return st.login || "без имени";
+    }
+
     async function buildDzList(students) {
       const map = new Map();
       DEFAULT_DZ_LIST.forEach((d) => map.set(d.key, d.title));
@@ -422,16 +416,13 @@
             map.set(key, titleText ? `ДЗ ${numText} • ${titleText}` : `ДЗ ${numText}`);
           });
         }
-      } catch (e) {
-        console.warn("Не удалось прочитать index.html, используем базовый список:", e);
-      }
+      } catch (e) {}
 
       students.forEach((st) => {
         Object.keys(st.dz || {}).forEach((rawKey) => {
           const key = rawKey.toLowerCase();
           if (/^dz\d+$/i.test(key) && !map.has(key)) {
-            const num = key.replace(/\D/g, "");
-            map.set(key, `ДЗ ${num}`);
+            map.set(key, `ДЗ ${key.replace(/\D/g, "")}`);
           }
         });
       });
@@ -457,7 +448,7 @@
         return;
       }
 
-      root.innerHTML = `<div class="denied-box"><h2>Загружаем ответы...</h2><p>Читаем базу учеников</p></div>`;
+      root.innerHTML = `<div class="denied-box"><h2>Загружаем ответы...</h2><p>Читаем базу учеников и формируем рейтинги по группам</p></div>`;
 
       try {
         const snap = await PA.getDb().collection("students").get();
@@ -465,13 +456,30 @@
         snap.forEach((doc) => {
           const data = doc.data();
           if (data.email === PA.teacherEmail) return;
-          allStudents.push({ uid: doc.id, ...data });
+          const login = data.login || PA.getLoginFromEmail(data.email || "");
+          const parsed = PA.parseStudentLogin(login);
+          const stats = PA.computeRatingStats(data);
+          allStudents.push({ uid: doc.id, ...data, login, parsed, stats });
         });
-        allStudents.sort((a, b) =>
-          (a.displayName || a.login || "").localeCompare(b.displayName || b.login || "", "ru")
-        );
 
         DZ_LIST = await buildDzList(allStudents);
+
+        // Фоново синхронизируем коллекцию ratings, чтобы у учеников сразу был актуальный рейтинг
+        allStudents.forEach((st) => {
+          const rPayload = {
+            login: st.login,
+            groupKey: st.parsed.groupKey,
+            groupLabel: st.parsed.groupLabel,
+            studentNum: st.parsed.studentNum,
+            grade: st.parsed.grade,
+            code: st.parsed.code,
+            ...st.stats,
+            updatedAt: st.updatedAt || new Date().toISOString()
+          };
+          if (st.displayName) rPayload.displayName = st.displayName;
+          PA.getDb().collection("ratings").doc(st.uid).set(rPayload, { merge: true }).catch(() => {});
+        });
+
         renderDashboard();
       } catch (err) {
         console.error(err);
@@ -484,40 +492,138 @@
       }
     }
 
+    function sortForRanking(list) {
+      return [...list].sort((a, b) => {
+        if (b.stats.totalCorrect !== a.stats.totalCorrect) {
+          return b.stats.totalCorrect - a.stats.totalCorrect;
+        }
+        if (b.stats.firstTryCorrect !== a.stats.firstTryCorrect) {
+          return b.stats.firstTryCorrect - a.stats.firstTryCorrect;
+        }
+        if (a.stats.totalAttempts !== b.stats.totalAttempts) {
+          return a.stats.totalAttempts - b.stats.totalAttempts;
+        }
+        return formatStudentPrimaryName(a).localeCompare(formatStudentPrimaryName(b), "ru");
+      });
+    }
+
     function renderDashboard() {
       const root = document.getElementById("app-root");
-      let totalSolved = 0;
-      let totalCorrect = 0;
+      const PA = window.PhysAuth;
 
+      // Группируем всех учеников по их groupKey
+      const groupsMap = new Map();
       allStudents.forEach((st) => {
-        Object.values(st.dz || {}).forEach((dzObj) => {
-          Object.values(dzObj || {}).forEach((t) => {
-            totalSolved++;
-            if (t && t.isCorrect) totalCorrect++;
-          });
-        });
+        const gKey = st.parsed.groupKey;
+        if (!groupsMap.has(gKey)) {
+          groupsMap.set(gKey, { key: gKey, label: st.parsed.groupLabel, students: [] });
+        }
+        groupsMap.get(gKey).students.push(st);
       });
 
+      const orderedGroupKeys = PA.sortGroupKeys(Array.from(groupsMap.keys()));
+      if (selectedGroup !== "ALL" && !groupsMap.has(selectedGroup)) {
+        selectedGroup = "ALL";
+      }
+
+      const visibleStudents =
+        selectedGroup === "ALL" ? allStudents : (groupsMap.get(selectedGroup)?.students || []);
+
+      let totalSolved = 0;
+      let totalCorrect = 0;
+      visibleStudents.forEach((st) => {
+        totalSolved += st.stats.totalSolved;
+        totalCorrect += st.stats.totalCorrect;
+      });
       const avgPct = totalSolved ? Math.round((totalCorrect / totalSolved) * 100) : 0;
 
-      let headerCols = DZ_LIST.map((d) => {
+      // Кнопки переключения групп
+      const groupTabsHtml = [
+        `<button class="group-tab ${selectedGroup === "ALL" ? "active" : ""}" data-group="ALL" type="button">
+          Все группы <span class="tab-count">${allStudents.length}</span>
+        </button>`,
+        ...orderedGroupKeys.map((gKey) => {
+          const g = groupsMap.get(gKey);
+          const extraCls = gKey === "UNKNOW" ? "tab-unknow" : "";
+          return `
+            <button class="group-tab ${extraCls} ${selectedGroup === gKey ? "active" : ""}" data-group="${esc(gKey)}" type="button">
+              ${esc(g.label)} <span class="tab-count">${g.students.length}</span>
+            </button>
+          `;
+        })
+      ].join("");
+
+      // Карточки рейтингов (отдельно по каждой группе)
+      const groupsToRank = selectedGroup === "ALL" ? orderedGroupKeys : [selectedGroup];
+      const ratingsHtml = groupsToRank
+        .map((gKey) => {
+          const g = groupsMap.get(gKey);
+          if (!g) return "";
+          const ranked = sortForRanking(g.students);
+
+          const rows = ranked
+            .map((st, idx) => {
+              const pos = idx + 1;
+              const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : pos;
+              const topCls = pos <= 3 && st.stats.totalCorrect > 0 ? `top-${pos}` : "";
+              const pct = st.stats.totalSolved
+                ? Math.round((st.stats.totalCorrect / st.stats.totalSolved) * 100)
+                : 0;
+              const subInfo = st.parsed.valid
+                ? `${st.parsed.grade} кл · №${st.parsed.studentNum} · ${st.parsed.code}`
+                : st.login;
+
+              return `
+                <div class="rank-row ${topCls}">
+                  <div class="rank-left">
+                    <div class="rank-pos">${medal}</div>
+                    <div style="min-width:0">
+                      <div class="rank-name">${esc(formatStudentPrimaryName(st))}</div>
+                      <div class="rank-sub">${esc(subInfo)}</div>
+                    </div>
+                  </div>
+                  <div class="rank-metrics">
+                    <div class="rank-score">${st.stats.totalCorrect} верно</div>
+                    <div class="rank-extra">с 1-й поп: ${st.stats.firstTryCorrect} · ${pct}%</div>
+                  </div>
+                </div>
+              `;
+            })
+            .join("");
+
+          return `
+            <div class="panel">
+              <div class="panel-head">
+                <div class="panel-title">
+                  🏆 Рейтинг: <span class="${getGroupBadgeClass(g.key)}">${esc(g.label)}</span>
+                </div>
+                <span class="panel-hint">${ranked.length} уч.</span>
+              </div>
+              <div class="rank-list">${rows}</div>
+            </div>
+          `;
+        })
+        .join("");
+
+      // Таблица по ДЗ (отсортирована по рейтингу выбранных учеников)
+      const headerCols = DZ_LIST.map((d) => {
         const num = d.key.replace(/\D/g, "");
         return `<th title="${esc(d.title)}">ДЗ ${esc(num)}</th>`;
       }).join("");
 
+      const sortedTableStudents = sortForRanking(visibleStudents);
       let rowsHtml = "";
-      if (allStudents.length === 0) {
+      if (sortedTableStudents.length === 0) {
         rowsHtml = `
           <tr>
             <td colspan="${DZ_LIST.length + 1}" style="text-align:center; padding:30px; color:#94a3b8;">
-              Пока ни один ученик не заходил на сайт. Как только ученики введут свой логин/пароль, они появятся здесь.
+              Пока ни один ученик из этой группы не заходил на сайт.
             </td>
           </tr>
         `;
       } else {
-        rowsHtml = allStudents
+        rowsHtml = sortedTableStudents
           .map((st) => {
-            const label = st.displayName || st.login || "без имени";
             const cells = DZ_LIST.map((dz) => {
               const tasks = st.dz?.[dz.key];
               if (!tasks || Object.keys(tasks).length === 0) {
@@ -538,8 +644,11 @@
                 <td>
                   <div class="student-cell">
                     <div>
-                      <div class="student-name">${esc(label)}</div>
-                      <div class="student-login">${esc(st.login || "")}</div>
+                      <div class="student-name">${esc(formatStudentPrimaryName(st))}</div>
+                      <div style="display:flex; align-items:center; gap:6px; margin-top:3px; flex-wrap:wrap;">
+                        <span class="${getGroupBadgeClass(st.parsed.groupKey)}">${esc(st.parsed.groupLabel)}</span>
+                        <span class="student-login">${esc(st.parsed.raw)}</span>
+                      </div>
                     </div>
                     <button class="edit-name-btn" data-rename-uid="${esc(st.uid)}" title="Изменить имя" type="button">✎</button>
                   </div>
@@ -554,8 +663,12 @@
       root.innerHTML = `
         <div class="stats-row">
           <div class="stat-card">
-            <div class="stat-label">Учеников в базе</div>
-            <div class="stat-value">${allStudents.length}</div>
+            <div class="stat-label">Учеников</div>
+            <div class="stat-value">${visibleStudents.length}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Групп</div>
+            <div class="stat-value">${orderedGroupKeys.length}</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Всего ответов</div>
@@ -566,6 +679,10 @@
             <div class="stat-value" style="color:#34d399">${avgPct}%</div>
           </div>
         </div>
+
+        <div class="group-tabs">${groupTabsHtml}</div>
+
+        ${orderedGroupKeys.length ? `<div class="ratings-grid">${ratingsHtml}</div>` : ""}
 
         <div class="panel">
           <div class="panel-head">
@@ -588,6 +705,13 @@
         </div>
       `;
 
+      root.querySelectorAll(".group-tab").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          selectedGroup = tab.dataset.group;
+          renderDashboard();
+        });
+      });
+
       root.querySelectorAll(".cell-btn").forEach((btn) => {
         btn.addEventListener("click", () => openDetailModal(btn.dataset.uid, btn.dataset.dz));
       });
@@ -600,16 +724,15 @@
     async function renameStudent(uid) {
       const st = allStudents.find((s) => s.uid === uid);
       if (!st) return;
-      const current = st.displayName || st.login || "";
-      const nextName = prompt("Введите имя и фамилию ученика для таблицы:", current);
+      const current = st.displayName || formatStudentPrimaryName(st);
+      const nextName = prompt("Введите имя и фамилию ученика:", current);
       if (nextName === null) return;
       const clean = nextName.trim();
       try {
-        await window.PhysAuth.getDb().collection("students").doc(uid).set(
-          { displayName: clean || st.login },
-          { merge: true }
-        );
-        st.displayName = clean || st.login;
+        const db = window.PhysAuth.getDb();
+        await db.collection("students").doc(uid).set({ displayName: clean }, { merge: true });
+        await db.collection("ratings").doc(uid).set({ displayName: clean }, { merge: true }).catch(() => {});
+        st.displayName = clean;
         renderDashboard();
       } catch (err) {
         alert("Не удалось сохранить имя: " + err.message);
@@ -630,9 +753,9 @@
       const okCount = entries.filter(([, e]) => e.isCorrect).length;
       const total = st.dzMeta?.[dzKey]?.total;
 
-      document.getElementById("modal-title").textContent = `${st.displayName || st.login} — ${dzInfo.title}`;
+      document.getElementById("modal-title").textContent = `${formatStudentPrimaryName(st)} — ${dzInfo.title}`;
       document.getElementById("modal-sub").textContent =
-        `Верно: ${okCount}` + (total ? ` из ${total}` : ` (решалось: ${entries.length})`);
+        `${st.parsed.groupLabel} · Верно: ${okCount}` + (total ? ` из ${total}` : ` (решалось: ${entries.length})`);
 
       const body = document.getElementById("modal-body");
       if (entries.length === 0) {
@@ -685,14 +808,17 @@
       const { uid, dzKey } = activeDetail;
       if (!confirm("Точно удалить все ответы ученика за это ДЗ?")) return;
       try {
-        await window.PhysAuth.getDb()
+        const PA = window.PhysAuth;
+        await PA.getDb()
           .collection("students")
           .doc(uid)
-          .update({
-            [`dz.${dzKey}`]: firebase.firestore.FieldValue.delete()
-          });
+          .update({ [`dz.${dzKey}`]: firebase.firestore.FieldValue.delete() });
         const st = allStudents.find((s) => s.uid === uid);
-        if (st && st.dz) delete st.dz[dzKey];
+        if (st && st.dz) {
+          delete st.dz[dzKey];
+          st.stats = PA.computeRatingStats(st);
+          await PA.getDb().collection("ratings").doc(uid).set(st.stats, { merge: true }).catch(() => {});
+        }
         closeDetailModal();
         renderDashboard();
       } catch (err) {
@@ -706,10 +832,16 @@
     });
 
     document.getElementById("btn-csv").addEventListener("click", () => {
-      const headers = ["Ученик", "Логин", ...DZ_LIST.map((d) => d.title)];
+      const headers = ["Группа", "Ученик", "Логин", "Верно всего", "С 1-й попытки", ...DZ_LIST.map((d) => d.title)];
       const rows = [headers];
-      allStudents.forEach((st) => {
-        const line = [st.displayName || st.login, st.login || ""];
+      sortForRanking(allStudents).forEach((st) => {
+        const line = [
+          st.parsed.groupLabel,
+          formatStudentPrimaryName(st),
+          st.parsed.raw,
+          st.stats.totalCorrect,
+          st.stats.firstTryCorrect
+        ];
         DZ_LIST.forEach((dz) => {
           const tasks = st.dz?.[dz.key];
           if (!tasks) {
@@ -731,9 +863,7 @@
       a.click();
     });
 
-    window.addEventListener("physauth:ready", () => {
-      loadDashboard();
-    });
+    window.addEventListener("physauth:ready", loadDashboard);
   </script>
 </body>
 </html>
