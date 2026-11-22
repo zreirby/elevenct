@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#090a10" />
+  <title>Выбор задания • Физика</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-main: #090a10;
+      --surface-card: rgba(18, 22, 34, 0.72);
+      --surface-elevated: rgba(26, 32, 48, 0.85);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --text-muted: #64748b;
+
+      --accent: #6366f1;
+      --border: rgba(255, 255, 255, 0.08);
+      --radius-xl: 24px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+
+      /* Цвета по умолчанию (переопределяются в каждом разделе) */
+      --block-accent: #6366f1;
+      --block-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      --block-badge-bg: rgba(99, 102, 241, 0.14);
+      --block-badge-border: rgba(99, 102, 241, 0.25);
+      --block-badge-text: #e0e7ff;
+      --block-glow: rgba(99, 102, 241, 0.25);
+      --block-hover-border: rgba(255, 255, 255, 0.22);
+      --block-active-border: rgba(139, 92, 246, 0.55);
+      --block-ripple-1: rgba(165, 180, 252, 0.35);
+      --block-ripple-2: rgba(139, 92, 246, 0.14);
+
+      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      --mono: "JetBrains Mono", monospace;
+      --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: clip;
+      position: relative;
+    }
+
+    /* Живой фиксированный фон без лагов на мобильных устройствах */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -15%;
+      z-index: -1;
+      pointer-events: none;
+      background-image:
+        radial-gradient(at 15% 15%, rgba(56, 189, 248, 0.14) 0px, transparent 45%),
+        radial-gradient(at 85% 30%, rgba(168, 85, 247, 0.13) 0px, transparent 45%),
+        radial-gradient(at 50% 85%, rgba(251, 113, 133, 0.10) 0px, transparent 45%);
+      animation: ambientDrift 14s ease-in-out infinite alternate;
+      will-change: transform;
+    }
+
+    @keyframes ambientDrift {
+      0% {
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+      100% {
+        transform: translate3d(-2%, 2.5%, 0) scale(1.06);
+      }
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translate3d(0, 18px, 0) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+    }
+
+    @keyframes tapRipple {
+      to {
+        transform: scale(1);
+        opacity: 0;
+      }
+    }
+
+    /* Шапка */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(9, 10, 16, 0.78);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 20px;
+      text-align: center;
+    }
+
+    .header-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Главный контейнер */
+    main {
+      max-width: 620px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 36px 20px 56px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 32px;
+      animation: fadeSlideUp 0.55s var(--ease-spring) both;
+    }
+
+    .hero h1 {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-sub);
+    }
+
+    .hero p:empty {
+      display: none;
+    }
+
+    /* Карточка меню */
+    .menu-card {
+      background: var(--surface-card);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      padding: 28px;
+      text-align: center;
+      animation: fadeSlideUp 0.6s var(--ease-spring) 0.06s both;
+    }
+
+    .card-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      padding: 4px 14px;
+      border-radius: 30px;
+      margin-bottom: 24px;
+    }
+
+    /* Секции разделов */
+    .sections-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Цветовая кодировка по блокам */
+    .section-kinematics {
+      --block-accent: #38bdf8;
+      --block-gradient: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);
+      --block-badge-bg: rgba(56, 189, 248, 0.13);
+      --block-badge-border: rgba(56, 189, 248, 0.28);
+      --block-badge-text: #bae6fd;
+      --block-glow: rgba(56, 189, 248, 0.24);
+      --block-hover-border: rgba(56, 189, 248, 0.35);
+      --block-active-border: rgba(56, 189, 248, 0.55);
+      --block-ripple-1: rgba(125, 211, 252, 0.34);
+      --block-ripple-2: rgba(99, 102, 241, 0.16);
+      --delay-base: 0.08s;
+    }
+
+    .section-dynamics {
+      --block-accent: #a855f7;
+      --block-gradient: linear-gradient(135deg, #8b5cf6 0%, #c084fc 100%);
+      --block-badge-bg: rgba(168, 85, 247, 0.14);
+      --block-badge-border: rgba(168, 85, 247, 0.30);
+      --block-badge-text: #e9d5ff;
+      --block-glow: rgba(168, 85, 247, 0.25);
+      --block-hover-border: rgba(168, 85, 247, 0.36);
+      --block-active-border: rgba(192, 132, 252, 0.55);
+      --block-ripple-1: rgba(216, 180, 254, 0.34);
+      --block-ripple-2: rgba(139, 92, 246, 0.16);
+      --delay-base: 0.24s;
+    }
+
+    .section-conservation {
+      --block-accent: #fb7185;
+      --block-gradient: linear-gradient(135deg, #ec4899 0%, #fb7185 100%);
+      --block-badge-bg: rgba(251, 113, 133, 0.14);
+      --block-badge-border: rgba(251, 113, 133, 0.30);
+      --block-badge-text: #fecdd3;
+      --block-glow: rgba(251, 113, 133, 0.24);
+      --block-hover-border: rgba(251, 113, 133, 0.36);
+      --block-active-border: rgba(251, 113, 133, 0.55);
+      --block-ripple-1: rgba(253, 164, 175, 0.34);
+      --block-ripple-2: rgba(236, 72, 153, 0.16);
+      --delay-base: 0.40s;
+    }
+
+    /* Заголовок-разделитель подраздела */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding: 0 2px;
+      animation: fadeSlideUp 0.5s var(--ease-spring) var(--delay-base) both;
+    }
+
+    .section-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--block-accent);
+      box-shadow: 0 0 10px var(--block-accent);
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-sub);
+      white-space: nowrap;
+    }
+
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 100%);
+    }
+
+    /* Вертикальный список длинных кнопок */
+    .buttons-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Длинная кнопка-ссылка */
+    .nav-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      text-decoration: none;
+      padding: 16px 20px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      transition: transform 0.28s var(--ease-spring), border-color 0.25s ease, box-shadow 0.28s ease;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      animation: fadeSlideUp 0.55s var(--ease-spring) both;
+    }
+
+    .nav-btn:nth-child(1) { animation-delay: calc(var(--delay-base) + 0.04s); }
+    .nav-btn:nth-child(2) { animation-delay: calc(var(--delay-base) + 0.08s); }
+    .nav-btn:nth-child(3) { animation-delay: calc(var(--delay-base) + 0.12s); }
+    .nav-btn:nth-child(4) { animation-delay: calc(var(--delay-base) + 0.16s); }
+
+    .nav-btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--block-gradient);
+      opacity: 0;
+      transition: opacity 0.28s var(--ease-spring);
+      z-index: 0;
+    }
+
+    .tap-ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--block-ripple-1) 0%, var(--block-ripple-2) 50%, transparent 72%);
+      transform: scale(0);
+      opacity: 1;
+      pointer-events: none;
+      z-index: 0;
+      animation: tapRipple 0.55s var(--ease-spring) forwards;
+    }
+
+    .nav-btn:focus-visible {
+      outline: 2px solid var(--block-accent);
+      outline-offset: 2px;
+    }
+
+    /* Живой отклик при касании на телефоне и клике мышкой */
+    .nav-btn.is-pressed,
+    .nav-btn:active {
+      transform: scale(0.975);
+      border-color: var(--block-active-border);
+      box-shadow: 0 10px 24px -8px var(--block-glow);
+    }
+
+    .nav-btn.is-pressed::before,
+    .nav-btn:active::before {
+      opacity: 0.15;
+    }
+
+    .nav-btn.is-pressed .btn-num,
+    .nav-btn:active .btn-num {
+      transform: scale(1.06);
+      background: var(--block-gradient);
+      border-color: transparent;
+      color: #ffffff;
+    }
+
+    .nav-btn.is-pressed .btn-arrow,
+    .nav-btn:active .btn-arrow {
+      transform: translateX(4px);
+      color: #ffffff;
+    }
+
+    .btn-left {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .btn-num {
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      background: var(--block-badge-bg);
+      border: 1px solid var(--block-badge-border);
+      font-size: 20px;
+      font-weight: 800;
+      font-family: var(--mono);
+      color: var(--block-badge-text);
+      transition: transform 0.28s var(--ease-spring), background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    }
+
+    .btn-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.35;
+      text-align: left;
+      overflow-wrap: break-word;
+    }
+
+    .btn-arrow {
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      color: var(--text-muted);
+      transition: transform 0.28s var(--ease-spring), color 0.25s ease;
+    }
+
+    /* Эффекты наведения только для устройств с мышью */
+    @media (hover: hover) and (pointer: fine) {
+      .nav-btn:hover {
+        transform: translateY(-2px);
+        border-color: var(--block-hover-border);
+        box-shadow: 0 14px 28px -10px var(--block-glow);
+      }
+
+      .nav-btn:hover::before {
+        opacity: 0.12;
+      }
+
+      .nav-btn:hover .btn-num {
+        transform: scale(1.06);
+        background: var(--block-gradient);
+        border-color: transparent;
+        color: #ffffff;
+      }
+
+      .nav-btn:hover .btn-arrow {
+        transform: translateX(4px);
+        color: #ffffff;
+      }
+    }
+
+    /* Адаптация под мобильные экраны */
+    @media (max-width: 520px) {
+      header {
+        padding: 14px 16px;
+      }
+
+      main {
+        padding: 24px 14px 40px;
+      }
+
+      .hero {
+        margin-bottom: 24px;
+      }
+
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .hero p {
+        font-size: 15px;
+      }
+
+      .menu-card {
+        padding: 20px 14px;
+        border-radius: 20px;
+      }
+
+      .card-label {
+        margin-bottom: 18px;
+      }
+
+      .sections-wrap {
+        gap: 20px;
+      }
+
+      .section-divider {
+        margin-bottom: 10px;
+      }
+
+      .buttons-grid {
+        gap: 10px;
+      }
+
+      .nav-btn {
+        padding: 13px 14px;
+        border-radius: 14px;
+        gap: 10px;
+      }
+
+      .btn-left {
+        gap: 12px;
+      }
+
+      .btn-num {
+        width: 38px;
+        height: 38px;
+        font-size: 17px;
+        border-radius: 10px;
+      }
+
+      .btn-title {
+        font-size: 15px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body::before,
+      .hero,
+      .menu-card,
+      .section-divider,
+      .nav-btn {
+        animation: none !important;
+      }
+      .tap-ripple {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Шапка -->
+  <header>
+    <div class="header-title">@physarea.ct</div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>Физика</h1>
+      <p></p>
+    </div>
+
+    <div class="menu-card">
+      <div class="card-label">Список заданий</div>
+
+      <div class="sections-wrap">
+
+        <!-- Блок 1: Кинематика -->
+        <section class="topic-section section-kinematics">
+          <div class="section-divider">
+            <span class="section-dot" aria-hidden="true"></span>
+            <span class="section-title">Кинематика</span>
+            <span class="section-line" aria-hidden="true"></span>
+          </div>
+
+          <div class="buttons-grid">
+            <a href="dz1/dz3.html" class="nav-btn">
+              <div class="btn-left">
+                <span class="btn-num">1</span>
+                <span class="btn-title">РПД</span>
+              </div>
+              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+
+            <a href="dz2/dz2.html" class="nav-btn">
+              <div class="btn-left">
+                <span class="btn-num">2</span>
+                <span class="btn-title">РУД</span>
+              </div>
+              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+
+            <a href="dz3/dz4.html" class="nav-btn">
+              <div class="btn-left">
+                <span class="btn-num">3</span>
+                <span class="btn-title">Свободное падение</span>
+              </div>
+              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+
+            <a href="dz4/dz5.html" class="nav-btn">
+              <div class="btn-left">
+                <span class="btn-num">4</span>
+                <span class="btn-title">Движение по окружности</span>
+              </div>
+              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+          </div>
+        </section>
+
+        <!-- Блок 2: Динамика -->
+        <section class="topic-section section-dynamics">
+          <div class="section-divider">
+            <span class="section-dot" aria-hidden="true"></span>
+            <span class="section-title">Динамика</span>
+            <span class="section-line" aria-hidden="true"></span>
+          </div>
+
+          <div class="buttons-grid">
+            <a href="dz5/dz6.html" class="nav-btn">
+              <div class="btn-left">
+                <span class="btn-num">5</span>
+                <span class="btn-title">Законы Ньютона. Сила тяжести и вес</span>
+              </div>
+              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+
+            <a href="dz6/dz7.html" class="nav-btn">
+              <div class="btn-left">
+                <span class="btn-num">6</span>
+                <span class="btn-title">Трение. Наклонная плоскость. Движение связанных тел</span>
+              </div>
+              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+
+            <a href="dz7/dz8.html" class="nav-btn">
+              <div class="btn-left">
+                <span class="btn-num">7</span>
+                <span class="btn-title">Сила упругости. Закон Всемирного тяготения</span>
+              </div>
+              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+
+            <a href="dz8/dz9.html" class="nav-btn">
+              <div class="btn-left">
+                <span class="btn-num">8</span>
+                <span class="btn-title">Динамика движения тел по окружности</span>
+              </div>
+              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+          </div>
+        </section>
+
+        <!-- Блок 3: Законы сохранения -->
+        <section class="topic-section section-conservation">
+          <div class="section-divider">
+            <span class="section-dot" aria-hidden="true"></span>
+            <span class="section-title">Законы сохранения</span>
+            <span class="section-line" aria-hidden="true"></span>
+          </div>
+
+          <div class="buttons-grid">
+            <a href="dz9/dz10.html" class="nav-btn">
+              <div class="btn-left">
+                <span class="btn-num">9</span>
+                <span class="btn-title">Импульс</span>
+              </div>
+              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+
+            <a href="dz10/dz11.html" class="nav-btn">
+              <div class="btn-left">
+                <span class="btn-num">10</span>
+                <span class="btn-title">Работа. Мощность</span>
+              </div>
+              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.querySelectorAll('.nav-btn').forEach((btn) => {
+      let startX = 0;
+      let startY = 0;
+      let releaseTimer = null;
+
+      const clearPressed = () => {
+        clearTimeout(releaseTimer);
+        btn.classList.remove('is-pressed');
+      };
+
+      btn.addEventListener('pointerdown', (e) => {
+        clearTimeout(releaseTimer);
+        startX = e.clientX;
+        startY = e.clientY;
+        btn.classList.add('is-pressed');
+
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height) * 1.4;
+        const ripple = document.createElement('span');
+        ripple.className = 'tap-ripple';
+        ripple.style.width = `${size}px`;
+        ripple.style.height = `${size}px`;
+        ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+        ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
+
+        btn.appendChild(ripple);
+        ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
+      }, { passive: true });
+
+      btn.addEventListener('pointermove', (e) => {
+        if (!btn.classList.contains('is-pressed')) return;
+        if (Math.hypot(e.clientX - startX, e.clientY - startY) > 10) {
+          clearPressed();
+        }
+      }, { passive: true });
+
+      btn.addEventListener('pointerup', () => {
+        releaseTimer = setTimeout(clearPressed, 160);
+      }, { passive: true });
+
+      btn.addEventListener('pointercancel', clearPressed, { passive: true });
+    });
+
+    window.addEventListener('pageshow', () => {
+      document.querySelectorAll('.nav-btn.is-pressed').forEach((btn) => {
+        btn.classList.remove('is-pressed');
+      });
+      document.querySelectorAll('.tap-ripple').forEach((el) => el.remove());
+    });
+  </script>
+
+</body>
+</html>
