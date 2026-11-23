@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ДЗ • Свободное падение</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+  <!-- KaTeX для формул -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="initMath()"></script>
+
+  <style>
+    :root {
+      --bg-main: #090a10;
+      --surface-card: rgba(18, 22, 34, 0.72);
+      --surface-elevated: rgba(26, 32, 48, 0.85);
+      --surface-input: rgba(13, 16, 26, 0.7);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --text-muted: #64748b;
+      
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-glow: rgba(99, 102, 241, 0.25);
+      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+      
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.2);
+      --error: #f43f5e;
+      --error-glow: rgba(244, 63, 94, 0.2);
+      
+      --border: rgba(255, 255, 255, 0.08);
+      --radius-xl: 24px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      
+      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg-main);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 20%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+        radial-gradient(at 50% 80%, rgba(236, 72, 153, 0.07) 0px, transparent 50%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      line-height: 1.6;
+      padding-top: 40px;
+      padding-bottom: 140px;
+      overflow-x: hidden;
+    }
+
+    /* Главный контейнер */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      padding: 5px 16px;
+      border-radius: 30px;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-sub);
+    }
+
+    /* Карточки задач */
+    .card {
+      background: var(--surface-card);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      padding: 32px;
+      margin-bottom: 28px;
+      transition: transform 0.35s var(--ease-spring), box-shadow 0.35s var(--ease-spring), border-color 0.35s var(--ease-spring);
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 28px 50px -15px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    .task-num {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      padding: 4px 12px;
+      border-radius: 30px;
+      margin-bottom: 16px;
+    }
+
+    .task-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.55;
+      margin-bottom: 14px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 4px;
+    }
+
+    .task-desc {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-sub);
+      margin-bottom: 14px;
+    }
+
+    /* Блоки с картинками */
+    .task-image-box {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin: 16px 0 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .task-image-box img {
+      max-width: 100%;
+      max-height: 250px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+
+    .img-caption {
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    /* Поля ввода и кнопки */
+    .input-action-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .input-text {
+      flex: 1;
+      min-width: 200px;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--surface-input);
+      color: var(--text-main);
+      outline: none;
+      transition: all 0.25s var(--ease-spring);
+    }
+
+    .input-text:focus {
+      border-color: var(--accent);
+      background: rgba(20, 26, 42, 0.9);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .btn-main {
+      background: var(--accent-gradient);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 14px 26px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.25s var(--ease-spring);
+      box-shadow: 0 4px 18px var(--accent-glow);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-main:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4);
+      filter: brightness(1.1);
+    }
+
+    .btn-main:active {
+      transform: scale(0.97);
+    }
+
+    /* Кнопки вариантов ответов */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .btn-option {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.25s var(--ease-spring);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .btn-option:hover:not(:disabled) {
+      background: rgba(45, 55, 80, 0.95);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-option:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    .btn-option.correct {
+      background: var(--success) !important;
+      border-color: var(--success) !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 24px var(--success-glow) !important;
+    }
+
+    .btn-option.incorrect {
+      background: var(--error) !important;
+      border-color: var(--error) !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 24px var(--error-glow) !important;
+    }
+
+    /* Уведомления и решение */
+    .status-msg {
+      display: none;
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 700;
+      animation: smoothSlideIn 0.35s var(--ease-spring) forwards;
+    }
+
+    .status-msg.correct {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .status-msg.incorrect {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(244, 63, 94, 0.1);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.25);
+    }
+
+    .btn-solution {
+      display: none;
+      margin-top: 14px;
+      background: rgba(244, 63, 94, 0.08);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.25);
+      padding: 11px 22px;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.25s var(--ease-spring);
+    }
+
+    .btn-solution:hover {
+      background: rgba(244, 63, 94, 0.16);
+      border-color: #f43f5e;
+      transform: translateY(-1px);
+    }
+
+    /* Блок решения с полной адаптивностью */
+    .solution-box {
+      display: none;
+      margin-top: 18px;
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: var(--radius-lg);
+      border-left: 4px solid var(--accent);
+      border-right: 1px solid var(--border);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 22px 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.75;
+      color: #e2e8f0;
+      animation: smoothSlideIn 0.4s var(--ease-spring) forwards;
+      max-width: 100%;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .solution-box strong {
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .solution-box p, .solution-box div {
+      margin-bottom: 10px;
+    }
+
+    .solution-box ol, .solution-box ul {
+      margin-left: 22px;
+      margin-bottom: 12px;
+    }
+
+    .solution-box li {
+      margin-bottom: 6px;
+    }
+
+    .math-scroll {
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 10px 0;
+      margin: 8px 0;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .math-scroll::-webkit-scrollbar,
+    .task-title::-webkit-scrollbar,
+    .solution-box::-webkit-scrollbar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+
+    .math-scroll::-webkit-scrollbar-thumb,
+    .task-title::-webkit-scrollbar-thumb,
+    .solution-box::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.5);
+      border-radius: 10px;
+    }
+
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 8px 0;
+      margin: 6px 0 !important;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .katex-display::-webkit-scrollbar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+
+    .katex-display::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.5);
+      border-radius: 10px;
+    }
+
+    @keyframes smoothSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.99);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <div class="hero">
+      <div class="hero-badge">ДЗ</div>
+      <h1>Свободное падение</h1>
+      <p>Выберите вариант ответа или введите полученное числовое значение.</p>
+    </div>
+
+    <!-- Задача 1 (№6) -->
+    <div class="card" id="task-1">
+      <div class="task-num">Задача 1</div>
+      <div class="task-title">Если тело свободно падает с некоторой высоты, то через время $t = 4{,}0\text{ с}$ модуль его скорости составит:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(1, '1', this)">1) 4,0 м/с</button>
+        <button class="btn-option" onclick="handleChoice(1, '2', this)">2) 16 м/с</button>
+        <button class="btn-option" onclick="handleChoice(1, '3', this)">3) 20 м/с</button>
+        <button class="btn-option" onclick="handleChoice(1, '4', this)">4) 40 м/с</button>
+        <button class="btn-option" onclick="handleChoice(1, '5', this)">5) 80 м/с</button>
+      </div>
+      <div class="status-msg" id="status-1"></div>
+      <button class="btn-solution" id="btn-sol-1" onclick="toggleSolution(1)">Показать Решение</button>
+      <div class="solution-box" id="sol-1">
+        <p>Для нахождения скорости свободно падающего тела используется формула зависимости скорости от времени:</p>
+        <div class="math-scroll">
+          $$v = v_0 + gt$$
+        </div>
+        <p>Так как тело падает свободно, его начальная скорость равна нулю ($v_0 = 0$). Формула упрощается до:</p>
+        <div class="math-scroll">
+          $$v = gt$$
+          $$v = 10\text{ м/с}^2 \cdot 4{,}0\text{ с} = 40\text{ м/с}$$
+        </div>
+        <strong>Ответ:</strong> вариант 4 (40 м/с).
+      </div>
+    </div>
+
+    <!-- Задача 2 (№7) -->
+    <div class="card" id="task-2">
+      <div class="task-num">Задача 2</div>
+      <div class="task-title">Если тело бросить вертикально вверх с высоты $h = 20\text{ м}$ со скоростью, модуль которой $v_0 = 4{,}0\text{ м/с}$, то через время $t = 2{,}0\text{ с}$ после начала движения тело окажется на высоте:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(2, '1', this)">1) 68 м</button>
+        <button class="btn-option" onclick="handleChoice(2, '2', this)">2) 40 м</button>
+        <button class="btn-option" onclick="handleChoice(2, '3', this)">3) 24 м</button>
+        <button class="btn-option" onclick="handleChoice(2, '4', this)">4) 8,0 м</button>
+        <button class="btn-option" onclick="handleChoice(2, '5', this)">5) 0 м</button>
+      </div>
+      <div class="status-msg" id="status-2"></div>
+      <button class="btn-solution" id="btn-sol-2" onclick="toggleSolution(2)">Показать Решение</button>
+      <div class="solution-box" id="sol-2">
+        <p>Используем уравнение координаты, так как тело брошено с высоты и меняет направление движения. Оно сразу показывает итоговую высоту над землей.</p>
+        <p>Направим ось $y$ вверх от земли.</p>
+        <p><strong>Уравнение в проекциях на ось $y$:</strong></p>
+        <div class="math-scroll">
+          $$y = y_0 + v_{0y}t + \frac{g_y t^2}{2}$$
+        </div>
+        <p>Начальная координата: $y_0 = 20\text{ м}$<br/>
+        Проекция скорости: $v_{0y} = +4{,}0\text{ м/с}$ (направлена вверх, вдоль оси)<br/>
+        Проекция ускорения: $g_y = -g = -10\text{ м/с}^2$ (направлено вниз, против оси)</p>
+        <div class="math-scroll">
+          $$y = 20 + 4{,}0 \cdot 2{,}0 + \frac{(-10) \cdot 2{,}0^2}{2} = 20 + 8{,}0 - 20 = 8{,}0\text{ м}$$
+        </div>
+        <strong>Ответ:</strong> вариант 4 (8,0 м).
+      </div>
+    </div>
+
+    <!-- Задача 3 (№8) -->
+    <div class="card" id="task-3">
+      <div class="task-num">Задача 3</div>
+      <div class="task-title">За третью секунду свободного падения тело проходит путь, равный:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(3, '1', this)">1) 45 м</button>
+        <button class="btn-option" onclick="handleChoice(3, '2', this)">2) 35 м</button>
+        <button class="btn-option" onclick="handleChoice(3, '3', this)">3) 30 м</button>
+        <button class="btn-option" onclick="handleChoice(3, '4', this)">4) 25 м</button>
+        <button class="btn-option" onclick="handleChoice(3, '5', this)">5) 15 м</button>
+      </div>
+      <div class="status-msg" id="status-3"></div>
+      <button class="btn-solution" id="btn-sol-3" onclick="toggleSolution(3)">Показать Решение</button>
+      <div class="solution-box" id="sol-3">
+        <p><strong>Закон Галилея гласит:</strong> пути, проходимые телом при свободном падении (без начальной скорости) за последовательные равные промежутки времени, относятся как последовательные нечетные числа:</p>
+        <div class="math-scroll">
+          $$s_1 : s_2 : s_3 : \ldots = 1 : 3 : 5 : \ldots$$
+        </div>
+        <ol>
+          <li>Путь за самую первую секунду ($t = 1\text{ с}$):
+            <div class="math-scroll">
+              $$s_1 = \frac{gt^2}{2} = \frac{10 \cdot 1^2}{2} = 5\text{ м}$$
+            </div>
+          </li>
+          <li>Путь за третью секунду ($s_3$) относится к первому как 5 к 1:
+            <div class="math-scroll">
+              $$s_3 = 5 \cdot s_1 = 5 \cdot 5\text{ м} = 25\text{ м}$$
+            </div>
+          </li>
+        </ol>
+        <strong>Ответ:</strong> вариант 4 (25 м).
+      </div>
+    </div>
+
+    <!-- Задача 4 (№10) -->
+    <div class="card" id="task-4">
+      <div class="task-num">Задача 4</div>
+      <div class="task-title">Камень падает в ущелье. Через время $t = 6{,}00\text{ с}$ слышен звук удара камня о землю. Если модуль скорости звука $v = 330\text{ м/с}$, то глубина ущелья составляет:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(4, '1', this)">1) 55,0 м</button>
+        <button class="btn-option" onclick="handleChoice(4, '2', this)">2) 110 м</button>
+        <button class="btn-option" onclick="handleChoice(4, '3', this)">3) 153 м</button>
+        <button class="btn-option" onclick="handleChoice(4, '4', this)">4) 242 м</button>
+        <button class="btn-option" onclick="handleChoice(4, '5', this)">5) 660 м</button>
+      </div>
+      <div class="status-msg" id="status-4"></div>
+      <button class="btn-solution" id="btn-sol-4" onclick="toggleSolution(4)">Показать Решение</button>
+      <div class="solution-box" id="sol-4">
+        <p>Свяжем глубину ущелья $h$ через уравнения движения камня и звука:</p>
+        <ol>
+          <li>Для камня: $h = \frac{gt_1^2}{2}$</li>
+          <li>Для звука: $h = v \cdot t_2$</li>
+        </ol>
+        <p>Так как общее время $t = t_1 + t_2 = 6\text{ с}$, выразим время движения звука: $t_2 = t - t_1$.</p>
+        <p>Приравняем правые части уравнений для высоты $h$:</p>
+        <div class="math-scroll">
+          $$\frac{gt_1^2}{2} = v(t - t_1)$$
+        </div>
+        <p>Подставим числа ($g = 10\text{ м/с}^2$, $v = 330\text{ м/с}$, $t = 6\text{ с}$):</p>
+        <div class="math-scroll">
+          $$\frac{10 \cdot t_1^2}{2} = 330(6 - t_1)$$
+          $$5t_1^2 = 1980 - 330t_1$$
+        </div>
+        <p>Перенесем всё в одну сторону и разделим уравнение на 5:</p>
+        <div class="math-scroll">
+          $$t_1^2 + 66t_1 - 396 = 0$$
+        </div>
+        <p>Решаем через дискриминант:</p>
+        <div class="math-scroll">
+          $$D = 66^2 - 4 \cdot 1 \cdot (-396) = 4356 + 1584 = 5940$$
+          $$t_1 = \frac{-66 + \sqrt{5940}}{2} \approx \frac{-66 + 77{,}07}{2} \approx 5{,}535\text{ с}$$
+          $$h = \frac{gt_1^2}{2} = \frac{10 \cdot (5{,}535)^2}{2} \approx 5 \cdot 30{,}64 \approx 153{,}2\text{ м} \approx 153\text{ м}$$
+        </div>
+        <strong>Ответ:</strong> вариант 3 (153 м).
+      </div>
+    </div>
+
+    <!-- Задача 5 (А1) -->
+    <div class="card" id="task-5">
+      <div class="task-num">Задача 5</div>
+      <div class="task-title">С высоты $h_1 = 13\text{ м}$ без начальной скорости начинает падать сосулька, оторвавшаяся от крыши дома. В момент времени $t = 1{,}0\text{ с}$ сосулька окажется на высоте $h_2$, равной:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(5, '1', this)">1) 3,0 м</button>
+        <button class="btn-option" onclick="handleChoice(5, '2', this)">2) 4,0 м</button>
+        <button class="btn-option" onclick="handleChoice(5, '3', this)">3) 5,0 м</button>
+        <button class="btn-option" onclick="handleChoice(5, '4', this)">4) 8,0 м</button>
+        <button class="btn-option" onclick="handleChoice(5, '5', this)">5) 10 м</button>
+      </div>
+      <div class="status-msg" id="status-5"></div>
+      <button class="btn-solution" id="btn-sol-5" onclick="toggleSolution(5)">Показать Решение</button>
+      <div class="solution-box" id="sol-5">
+        <p>Высота $h_2 = h_1 - \Delta r = 8{,}0\text{ м}$, где модуль перемещения сосульки:</p>
+        <div class="math-scroll">
+          $$\Delta r = \frac{gt^2}{2} = 5{,}0\text{ м}.$$
+        </div>
+        <strong>Ответ:</strong> вариант 4 (8,0 м).
+      </div>
+    </div>
+
+    <!-- Задача 6 (Задание 1) -->
+    <div class="card" id="task-6">
+      <div class="task-num">Задача 6</div>
+      <div class="task-title">Парашютист совершил прыжок с высоты $h$ над поверхностью Земли без начальной вертикальной скорости. В течение промежутка времени $\Delta t_1 = 4{,}0\text{ с}$ парашютист свободно падал, затем парашют раскрылся, и в течение пренебрежимо малого промежутка времени скорость парашютиста уменьшилась. Дальнейшее снижение парашютиста до момента приземления происходило в течение промежутка времени $\Delta t_2 = 80{,}0\text{ с}$ с постоянной вертикальной скоростью, модуль которой $v = 36{,}0\text{ }\frac{\text{км}}{\text{ч}}$. Высота $h$, с которой парашютист совершил прыжок, равна ... м.</div>
+      <div class="task-desc">Введите высоту $h$ в метрах ($\text{м}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-6-input" />
+        <button class="btn-main" onclick="validateCalculation(6)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-6"></div>
+      <button class="btn-solution" id="btn-sol-6" onclick="toggleSolution(6)">Показать Решение</button>
+      <div class="solution-box" id="sol-6">
+        <p>За 4 секунды свободного падения парашютист пролетел $\frac{g\Delta t_1^2}{2} = \frac{10 \cdot 4^2}{2} = 80\text{ м}$. За 80 секунд с постоянной скоростью $36\text{ км/ч} = 10\text{ м/с}$ парашютист пролетел $\Delta t_2 \cdot v = 80 \cdot 10 = 800\text{ м}$. Поэтому суммарная высота равна 880 м.</p>
+        <strong>Ответ:</strong> 880.
+      </div>
+    </div>
+
+    <!-- Задача 7 (Задание 2) -->
+    <div class="card" id="task-7">
+      <div class="task-num">Задача 7</div>
+      <div class="task-title">Тело, которое падало без начальной скорости ($v_0 = 0\text{ }\frac{\text{м}}{\text{с}}$) с некоторой высоты, за последнюю секунду движения прошло путь $s = 35\text{ м}$. Высота $h$, с которой тело упало, равна ... м.</div>
+      <div class="task-desc">Введите высоту $h$ в метрах ($\text{м}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-7-input" />
+        <button class="btn-main" onclick="validateCalculation(7)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-7"></div>
+      <button class="btn-solution" id="btn-sol-7" onclick="toggleSolution(7)">Показать Решение</button>
+      <div class="solution-box" id="sol-7">
+        <p>Координата тела, движущегося равноускоренно без начальной скорости, зависит от времени по закону $x(t) = \frac{gt^2}{2} = 5t^2$. За последнюю секунду тело прошло путь 35 м:</p>
+        <div class="math-scroll">
+          $$x(T) - x(T - 1) = 35,$$
+          $$5T^2 - 5(T - 1)^2 = 35,$$
+          $$10T - 5 = 35,$$
+          $$T = 4.$$
+        </div>
+        <p>Таким образом, время падения составляет $T = 4\text{ с}$, а высота падения равна $h = 5T^2 = 80\text{ м}$.</p>
+        <strong>Ответ:</strong> 80.
+      </div>
+    </div>
+
+    <!-- Задача 8 (Задание 3) -> image1.png -->
+    <div class="card" id="task-8">
+      <div class="task-num">Задача 8</div>
+      <div class="task-title">С башни в горизонтальном направлении бросили камень с начальной скоростью, модуль которой $v_0 = 20\text{ м/с}$. Если непосредственно перед падением на землю скорость камня была направлена под углом $\alpha = 45^\circ$ к горизонту, то камень упал на расстоянии $s$ от основания башни равном ... м.</div>
+      <div class="task-image-box">
+        <img src="image1.png" alt="Чертёж к задаче" onerror="this.src='https://via.placeholder.com/350x220?text=image1.png';" />
+      </div>
+      <div class="task-desc">Введите расстояние $s$ в метрах ($\text{м}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-8-input" />
+        <button class="btn-main" onclick="validateCalculation(8)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-8"></div>
+      <button class="btn-solution" id="btn-sol-8" onclick="toggleSolution(8)">Показать Решение</button>
+      <div class="solution-box" id="sol-8">
+        <p>При параболическом движении камня в поле тяжести Земли, горизонтальная составляющая его скорости не меняется, а вертикальная изменяется со временем как $v_y = gt$.</p>
+        <p>Так как скорость камня направлена под углом $45^\circ$ перед моментом падения на Землю, то $v_y = v_x = v_0$.</p>
+        <p>Найдем время полета камня:</p>
+        <div class="math-scroll">
+          $$t = \frac{v_y}{g} = \frac{v_0}{g}.$$
+        </div>
+        <p>Тогда камень упадет от башни на расстоянии:</p>
+        <div class="math-scroll">
+          $$s = v_x t = \frac{v_0^2}{g} = 40\text{ м}.$$
+        </div>
+        <strong>Ответ:</strong> 40 м.
+      </div>
+    </div>
+
+    <!-- Задача 9 (А4) -> image2.png -->
+    <div class="card" id="task-9">
+      <div class="task-num">Задача 9</div>
+      <div class="task-title">На рисунке 16 показан график зависимости проекции на вертикальную ось $Oy$ перемещения $\Delta r_y$ тела, брошенного вертикально вверх, от времени $t$. Модуль начальной скорости $v_0$ движения тела равен:</div>
+      <div class="task-image-box">
+        <img src="image2.png" alt="Рис. 16" onerror="this.src='https://via.placeholder.com/350x220?text=image2.png';" />
+        <div class="img-caption">Рис. 16</div>
+      </div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(9, '1', this)">1) 15 м/с</button>
+        <button class="btn-option" onclick="handleChoice(9, '2', this)">2) 20 м/с</button>
+        <button class="btn-option" onclick="handleChoice(9, '3', this)">3) 30 м/с</button>
+        <button class="btn-option" onclick="handleChoice(9, '4', this)">4) 40 м/с</button>
+        <button class="btn-option" onclick="handleChoice(9, '5', this)">5) 80 м/с</button>
+      </div>
+      <div class="status-msg" id="status-9"></div>
+      <button class="btn-solution" id="btn-sol-9" onclick="toggleSolution(9)">Показать Решение</button>
+      <div class="solution-box" id="sol-9">
+        <p>Из графика (рис. 16) следует, что максимальной высоты подъема $h_{\text{max}} = \Delta r = 80\text{ м}$ тело достигает в момент времени $t = 4{,}0\text{ с}$. Из уравнения $\Delta r = v_0 t - \frac{gt^2}{2}$ найдем ответ: $v_0 = 40\text{ }\frac{\text{м}}{\text{с}}$.</p>
+        <strong>Ответ:</strong> вариант 4 (40 м/с).
+      </div>
+    </div>
+
+    <!-- Задача 10 (А5) -->
+    <div class="card" id="task-10">
+      <div class="task-num">Задача 10</div>
+      <div class="task-title">Из точки А, находящейся над поверхностью земли, отпустили без начальной скорости маленький шарик, который падал на землю в течение времени $t_1 = 4{,}0\text{ с}$. Если из той же точки А шарик бросить вертикально вверх со скоростью, модуль которой $v_0 = 30\text{ }\frac{\text{м}}{\text{с}}$, то он будет падать на землю в течение времени $t_2$, равного:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(10, '1', this)">1) 4,0 с</button>
+        <button class="btn-option" onclick="handleChoice(10, '2', this)">2) 6,0 с</button>
+        <button class="btn-option" onclick="handleChoice(10, '3', this)">3) 7,0 с</button>
+        <button class="btn-option" onclick="handleChoice(10, '4', this)">4) 8,0 с</button>
+        <button class="btn-option" onclick="handleChoice(10, '5', this)">5) 9,0 с</button>
+      </div>
+      <div class="status-msg" id="status-10"></div>
+      <button class="btn-solution" id="btn-sol-10" onclick="toggleSolution(10)">Показать Решение</button>
+      <div class="solution-box" id="sol-10">
+        <strong>СИ:</strong>
+        <ul>
+          <li>$t_1 = 4{,}0\text{ с}$</li>
+          <li>$v_0 = 30\text{ м/с}$</li>
+          <li>$g = 10\text{ м/с}^2$</li>
+        </ul>
+        <p><strong>1. Первый случай (свободное падение без начальной скорости):</strong><br/>
+        Шарик падает с высоты $h$ за время $t_1$. Запишем формулу пути:</p>
+        <div class="math-scroll">
+          $$h = \frac{gt_1^2}{2} = \frac{10 \cdot 4{,}0^2}{2} = \frac{10 \cdot 16}{2} = 80\text{ м}$$
+        </div>
+        <p><strong>Второй случай (бросок вертикально вверх):</strong><br/>
+        Направим координатную ось $Y$ вертикально вверх, совместив начало координат ($y = 0$) с поверхностью земли. Тогда начальная координата шарика $y_0 = h = 80\text{ м}$, начальная скорость $v_{0y} = v_0 = 30\text{ м/с}$, а ускорение $a_y = -g = -10\text{ м/с}^2$. Уравнение движения шарика имеет вид:</p>
+        <div class="math-scroll">
+          $$y(t) = h + v_0 t_2 - \frac{gt_2^2}{2}$$
+          $$t_2^2 - 6t_2 - 16 = 0$$
+          $$t_2^{(1)} = \frac{6 + 10}{2} = 8{,}0\text{ с}$$
+          $$t_2^{(2)} = \frac{6 - 10}{2} = -2{,}0\text{ с (не удовлетворяет физическому смыслу)}$$
+        </div>
+        <strong>Ответ:</strong> вариант 4 (8,0 с).
+      </div>
+    </div>
+
+    <!-- Задача 11 (А8) -->
+    <div class="card" id="task-11">
+      <div class="task-num">Задача 11</div>
+      <div class="task-title">Тело свободно падало с некоторой высоты без начальной скорости. Если в момент удара о землю модуль скорости тела $v = 70\text{ }\frac{\text{м}}{\text{с}}$, то за последнюю секунду движения тело прошло путь $s$, равный:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(11, '1', this)">1) 35 м</button>
+        <button class="btn-option" onclick="handleChoice(11, '2', this)">2) 45 м</button>
+        <button class="btn-option" onclick="handleChoice(11, '3', this)">3) 55 м</button>
+        <button class="btn-option" onclick="handleChoice(11, '4', this)">4) 65 м</button>
+        <button class="btn-option" onclick="handleChoice(11, '5', this)">5) 75 м</button>
+      </div>
+      <div class="status-msg" id="status-11"></div>
+      <button class="btn-solution" id="btn-sol-11" onclick="toggleSolution(11)">Показать Решение</button>
+      <div class="solution-box" id="sol-11">
+        <p>Время падения тела $t_0 = \frac{v}{g} = 7{,}0\text{ с}$. Высота, с которой упало тело, $h_0 = \frac{gt_0^2}{2} = 245\text{ м}$. За промежуток времени $\Delta t = 6{,}0\text{ с}$, считая от начала падения, модуль перемещения тела $\Delta r = \frac{g\Delta t^2}{2} = 180\text{ м}$. Путь, который прошло тело за последнюю секунду:</p>
+        <div class="math-scroll">
+          $$s = h_0 - \Delta r = 65\text{ м}.$$
+        </div>
+        <strong>Ответ:</strong> вариант 4 (65 м).
+      </div>
+    </div>
+
+    <!-- Задача 12 (А9) -> image3.png -->
+    <div class="card" id="task-12">
+      <div class="task-num">Задача 12</div>
+      <div class="task-title">На рисунке 18 показан график зависимости пути $s$ шарика, брошенного вертикально вверх с поверхности земли, от времени $t$. Модуль скорости $v$ движения шарика в момент времени $t = 8\text{ с}$ равен:</div>
+      <div class="task-image-box">
+        <img src="image3.png" alt="Рис. 18" onerror="this.src='https://via.placeholder.com/350x220?text=image3.png';" />
+        <div class="img-caption">Рис. 18</div>
+      </div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(12, '1', this)">1) 15 м/с</button>
+        <button class="btn-option" onclick="handleChoice(12, '2', this)">2) 21 м/с</button>
+        <button class="btn-option" onclick="handleChoice(12, '3', this)">3) 30 м/с</button>
+        <button class="btn-option" onclick="handleChoice(12, '4', this)">4) 40 м/с</button>
+        <button class="btn-option" onclick="handleChoice(12, '5', this)">5) 80 м/с</button>
+      </div>
+      <div class="status-msg" id="status-12"></div>
+      <button class="btn-solution" id="btn-sol-12" onclick="toggleSolution(12)">Показать Решение</button>
+      <div class="solution-box" id="sol-12">
+        <p>Из графика (рис. 18) следует, что шарик достиг верхней точки траектории в момент времени $t_1 = 5\text{ с}$ и после этого падал вниз. В момент времени $t = 8\text{ с}$ модуль скорости движения шарика:</p>
+        <div class="math-scroll">
+          $$v = g(t - t_1) = 30\text{ }\frac{\text{м}}{\text{с}}.$$
+        </div>
+        <strong>Ответ:</strong> вариант 3 (30 м/с).
+      </div>
+    </div>
+
+    <!-- Задача 13 (А10) -->
+    <div class="card" id="task-13">
+      <div class="task-num">Задача 13</div>
+      <div class="task-title">За последнюю секунду свободно падающее тело прошло путь $h_1 = 45\text{ м}$. Если начальная скорость движения тела, модуль которой $v_0 = 20\text{ }\frac{\text{м}}{\text{с}}$, направлена вертикально вниз, то оно падало в течение промежутка времени $\Delta t$, равного:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(13, '1', this)">1) 3,0 с</button>
+        <button class="btn-option" onclick="handleChoice(13, '2', this)">2) 4,0 с</button>
+        <button class="btn-option" onclick="handleChoice(13, '3', this)">3) 5,0 с</button>
+        <button class="btn-option" onclick="handleChoice(13, '4', this)">4) 6,0 с</button>
+        <button class="btn-option" onclick="handleChoice(13, '5', this)">5) 8,0 с</button>
+      </div>
+      <div class="status-msg" id="status-13"></div>
+      <button class="btn-solution" id="btn-sol-13" onclick="toggleSolution(13)">Показать Решение</button>
+      <div class="solution-box" id="sol-13">
+        <ol>
+          <li>Найдем скорость $v_1$ в начале последней секунды. Путь за эту секунду (время равно 1 с) равен:
+            <div class="math-scroll">
+              $$h_1 = v_1 \cdot 1 + \frac{g \cdot 1^2}{2}$$
+              $$45 = v_1 + 5 \implies v_1 = 40\text{ м/с}$$
+            </div>
+          </li>
+          <li>Найдем время $t'$, которое тело летело до наступления последней секунды (разгоняясь от начальной скорости $v_0$ до скорости $v_1$):
+            <div class="math-scroll">
+              $$t' = \frac{v_1 - v_0}{g} = \frac{40 - 20}{10} = 2\text{ с}$$
+            </div>
+          </li>
+          <li>Полное время падения $\Delta t$ — это время до последней секунды плюс сама эта секунда:
+            <div class="math-scroll">
+              $$\Delta t = 2 + 1 = 3{,}0\text{ с}$$
+            </div>
+          </li>
+        </ol>
+        <strong>Ответ:</strong> вариант 1 (3,0 с).
+      </div>
+    </div>
+
+    <!-- Задача 14 (А14) -->
+    <div class="card" id="task-14">
+      <div class="task-num">Задача 14</div>
+      <div class="task-title">Два камня находятся на одной вертикальной линии на расстоянии $h = 20\text{ м}$ друг от друга. В некоторый момент времени верхний камень бросают вертикально вниз со скоростью, модуль которой $v_{01} = 2{,}0\text{ }\frac{\text{м}}{\text{с}}$, а нижний камень отпускают без начальной скорости. Промежуток времени $\Delta t$, через который камни столкнутся, равен:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(14, '1', this)">1) 2,0 с</button>
+        <button class="btn-option" onclick="handleChoice(14, '2', this)">2) 4,0 с</button>
+        <button class="btn-option" onclick="handleChoice(14, '3', this)">3) 6,0 с</button>
+        <button class="btn-option" onclick="handleChoice(14, '4', this)">4) 8,0 с</button>
+        <button class="btn-option" onclick="handleChoice(14, '5', this)">5) 10 с</button>
+      </div>
+      <div class="status-msg" id="status-14"></div>
+      <button class="btn-solution" id="btn-sol-14" onclick="toggleSolution(14)">Показать Решение</button>
+      <div class="solution-box" id="sol-14">
+        <p>Будем считать ось $Oy$ направленной вертикально вниз. Запишем уравнения движения верхнего и нижнего камней: $y_1 = v_{01}\Delta t + \frac{g\Delta t^2}{2}$, $y_2 = h + \frac{g\Delta t^2}{2}$. Так как в момент столкновения камней $y_1 = y_2$, то $v_{01}\Delta t + \frac{g\Delta t^2}{2} = h + \frac{g\Delta t^2}{2}$. Отсюда следует ответ:</p>
+        <div class="math-scroll">
+          $$\Delta t = \frac{h}{v_{01}} = 10\text{ с}.$$
+        </div>
+        <strong>Ответ:</strong> вариант 5 (10 с).
+      </div>
+    </div>
+
+    <!-- Задача 15 (А16) -->
+    <div class="card" id="task-15">
+      <div class="task-num">Задача 15</div>
+      <div class="task-title">Если тело свободно падает без начальной скорости с высоты $h = 180\text{ м}$, то средняя скорость движения тела $\langle v \rangle$ на последнем участке пути длиной $s = 100\text{ м}$ равна:</div>
+      <div class="options-grid">
+        <button class="btn-option" onclick="handleChoice(15, '1', this)">1) 20 м/с</button>
+        <button class="btn-option" onclick="handleChoice(15, '2', this)">2) 30 м/с</button>
+        <button class="btn-option" onclick="handleChoice(15, '3', this)">3) 40 м/с</button>
+        <button class="btn-option" onclick="handleChoice(15, '4', this)">4) 45 м/с</button>
+        <button class="btn-option" onclick="handleChoice(15, '5', this)">5) 50 м/с</button>
+      </div>
+      <div class="status-msg" id="status-15"></div>
+      <button class="btn-solution" id="btn-sol-15" onclick="toggleSolution(15)">Показать Решение</button>
+      <div class="solution-box" id="sol-15">
+        <p>Время падения тела $t = \sqrt{\frac{2h}{g}} = 6{,}0\text{ с}$. Время падения тела на первом участке пути $t_1 = \sqrt{\frac{2(h - s)}{g}} = 4{,}0\text{ с}$; на последнем участке пути — $\Delta t = t - t_1 = 2{,}0\text{ с}$. Искомая средняя скорость пути:</p>
+        <div class="math-scroll">
+          $$\langle v \rangle = \frac{s}{\Delta t} = 50\text{ }\frac{\text{м}}{\text{с}}.$$
+        </div>
+        <strong>Ответ:</strong> вариант 5 (50 м/с).
+      </div>
+    </div>
+
+    <!-- Задача 16 (В12) -->
+    <div class="card" id="task-16">
+      <div class="task-num">Задача 16</div>
+      <div class="task-title">Небольшой шарик бросили горизонтально с высоты $h$. Если шарик упал на поверхность через промежуток времени $\Delta t = 3{,}0\text{ с}$ со скоростью, модуль которой $v = 34\text{ }\frac{\text{м}}{\text{с}}$, то модуль начальной скорости шарика $v_0$ равен ... м/с.</div>
+      <div class="task-desc">Введите модуль начальной скорости в метрах в секунду ($\text{м/с}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-16-input" />
+        <button class="btn-main" onclick="validateCalculation(16)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-16"></div>
+      <button class="btn-solution" id="btn-sol-16" onclick="toggleSolution(16)">Показать Решение</button>
+      <div class="solution-box" id="sol-16">
+        <p>При горизонтальном броске скорость тела в любой момент времени складывается из двух перпендикулярных компонентов:</p>
+        <ol>
+          <li>Горизонтальная скорость $v_x = v_0$ (остается неизменной).</li>
+          <li>Вертикальная скорость $v_y = g \cdot \Delta t$ (растет из-за свободного падения).</li>
+        </ol>
+        <p>Используя ускорение свободного падения $g \approx 10\text{ м/с}^2$ и время падения $\Delta t = 3{,}0\text{ с}$:</p>
+        <div class="math-scroll">
+          $$v_y = 10\text{ }\frac{\text{м}}{\text{с}^2} \cdot 3{,}0\text{ с} = 30\text{ м/с}$$
+        </div>
+        <p>Полный модуль скорости $v$ связан с её компонентами по теореме Пифагора:</p>
+        <div class="math-scroll">
+          $$v^2 = v_x^2 + v_y^2 \implies v^2 = v_0^2 + v_y^2$$
+        </div>
+        <p>Подставим известные значения ($v = 34\text{ м/с}$, $v_y = 30\text{ м/с}$):</p>
+        <div class="math-scroll">
+          $$34^2 = v_0^2 + 30^2$$
+          $$1156 = v_0^2 + 900$$
+          $$v_0^2 = 1156 - 900 = 256$$
+          $$v_0 = \sqrt{256} = 16\text{ м/с}$$
+        </div>
+        <strong>Ответ:</strong> 16.
+      </div>
+    </div>
+
+    <!-- Задача 17 (В11) -->
+    <div class="card" id="task-17">
+      <div class="task-num">Задача 17</div>
+      <div class="task-title">Небольшой шарик бросили горизонтально с высоты $h = 80\text{ см}$, с начальной скоростью, модуль которой $v_0 = 3{,}5\text{ }\frac{\text{м}}{\text{с}}$. Дальность полёта $L$ тела равна ... дм.</div>
+      <div class="task-desc">Введите дальность полёта в дециметрах ($\text{дм}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-17-input" />
+        <button class="btn-main" onclick="validateCalculation(17)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-17"></div>
+      <button class="btn-solution" id="btn-sol-17" onclick="toggleSolution(17)">Показать Решение</button>
+      <div class="solution-box" id="sol-17">
+        <p>При горизонтальном броске движение по вертикали — это свободное падение без начальной скорости:</p>
+        <div class="math-scroll">
+          $$h = \frac{gt^2}{2} \implies t = \sqrt{\frac{2h}{g}}$$
+          $$t = \sqrt{\frac{2 \cdot 0{,}8}{10}} = \sqrt{0{,}16} = 0{,}4\text{ с}$$
+        </div>
+        <p>По горизонтали тело движется равномерно со скоростью $v_0$:</p>
+        <div class="math-scroll">
+          $$L = v_0 \cdot t$$
+          $$L = 3{,}5\text{ м/с} \cdot 0{,}4\text{ с} = 1{,}4\text{ м} = 14\text{ дм}$$
+        </div>
+        <strong>Ответ:</strong> 14.
+      </div>
+    </div>
+
+    <!-- Задача 18 (В2) -->
+    <div class="card" id="task-18">
+      <div class="task-num">Задача 18</div>
+      <div class="task-title">Два тела падают с одинаковой высоты $h = 20\text{ м}$: одно без начальной скорости, а другое — с начальной скоростью $\vec{v}_0$, направленной вертикально вниз. Если промежутки времени падения тел отличаются в $k = 2{,}0$ раза, то модуль начальной скорости $v_0$ второго тела равен ... м/с.</div>
+      <div class="task-desc">Введите модуль начальной скорости в метрах в секунду ($\text{м/с}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-18-input" />
+        <button class="btn-main" onclick="validateCalculation(18)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-18"></div>
+      <button class="btn-solution" id="btn-sol-18" onclick="toggleSolution(18)">Показать Решение</button>
+      <div class="solution-box" id="sol-18">
+        <ol>
+          <li><strong>Первое тело (свободное падение без начальной скорости):</strong><br/>
+            Оно летит дольше всего. Найдем его время падения $t_1$:
+            <div class="math-scroll">
+              $$h = \frac{gt_1^2}{2} \implies 20 = \frac{10 \cdot t_1^2}{2} \implies 20 = 5t_1^2 \implies t_1^2 = 4 \implies t_1 = 2{,}0\text{ с}$$
+            </div>
+          </li>
+          <li><strong>Второе тело (бросок вниз с начальной скоростью):</strong><br/>
+            Оно падает быстрее. Так как время отличается в 2,0 раза, то время его падения $t_2$ равно:
+            <div class="math-scroll">
+              $$t_2 = \frac{t_1}{2{,}0} = \frac{2{,}0}{2{,}0} = 1{,}0\text{ с}$$
+            </div>
+          </li>
+          <li><strong>Найдем начальную скорость $v_0$ второго тела:</strong><br/>
+            Запишем формулу пути для броска вертикально вниз за время $t_2$:
+            <div class="math-scroll">
+              $$h = v_0 t_2 + \frac{gt_2^2}{2}$$
+              $$20 = v_0 \cdot 1{,}0 + \frac{10 \cdot 1{,}0^2}{2}$$
+              $$20 = v_0 + 5 \implies v_0 = 15\text{ м/с}$$
+            </div>
+          </li>
+        </ol>
+        <strong>Ответ:</strong> 15.
+      </div>
+    </div>
+
+    <!-- Задача 19 (В3) -->
+    <div class="card" id="task-19">
+      <div class="task-num">Задача 19</div>
+      <div class="task-title">С высоты $h = 50\text{ м}$ сорвалась еловая шишка и свободно падала вниз. Если на середине пути шишка ударилась о выступающую ветку ели и при этом ее скорость уменьшилась в два раза, то в момент касания земли модуль скорости $v$ движения шишки равен ... м/с.</div>
+      <div class="task-desc">Введите модуль скорости в метрах в секунду ($\text{м/с}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-19-input" />
+        <button class="btn-main" onclick="validateCalculation(19)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-19"></div>
+      <button class="btn-solution" id="btn-sol-19" onclick="toggleSolution(19)">Показать Решение</button>
+      <div class="solution-box" id="sol-19">
+        <p>Из уравнения $\frac{h}{2} = \frac{v_1^2}{2g}$ найдем модуль скорости шишки на середине пути (перед ударом о ветку): $v_1 = \sqrt{hg}$. Сразу после удара модуль скорости шишки стал $v_2 = \frac{v_1}{2}$. Из формулы $\frac{h}{2} = \frac{v^2 - v_2^2}{2g}$ выразим модуль скорости шишки в момент касания земли: $v = \sqrt{hg + v_2^2}$. Из записанных уравнений найдем ответ:</p>
+        <div class="math-scroll">
+          $$v = \frac{\sqrt{5hg}}{2} = 25\text{ }\frac{\text{м}}{\text{с}}.$$
+        </div>
+        <strong>Ответ:</strong> 25.
+      </div>
+    </div>
+
+    <!-- Задача 20 (В6) -->
+    <div class="card" id="task-20">
+      <div class="task-num">Задача 20</div>
+      <div class="task-title">Комок снега бросили вертикально вверх с начальной скоростью $v_0 = 16\text{ }\frac{\text{м}}{\text{с}}$. Когда он достиг верхней точки полета, из той же начальной точки и с такой же начальной скоростью бросили вверх второй комок снега. Высота $h$, на которой, считая от точки бросания, комки снега встретятся, равна ... дм.</div>
+      <div class="task-desc">Введите высоту в дециметрах ($\text{дм}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-20-input" />
+        <button class="btn-main" onclick="validateCalculation(20)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-20"></div>
+      <button class="btn-solution" id="btn-sol-20" onclick="toggleSolution(20)">Показать Решение</button>
+      <div class="solution-box" id="sol-20">
+        <ol>
+          <li>Найдем время подъема $\tau$ первого комка до верхней точки:
+            <div class="math-scroll">
+              $$\tau = \frac{v_0}{g} = \frac{16}{10} = 1{,}6\text{ с}$$
+            </div>
+          </li>
+          <li>Найдем максимальную высоту подъема $H$ первого комка:
+            <div class="math-scroll">
+              $$H = \frac{v_0^2}{2g} = \frac{16^2}{2 \cdot 10} = \frac{256}{20} = 12{,}8\text{ м}$$
+            </div>
+          </li>
+          <li>Рассмотрим движение после броска второго комка (в этот момент запускается новый отсчет времени $t$):
+            <ul>
+              <li>Первый комок начинает свободно падать из верхней точки вниз без начальной скорости:
+                <div class="math-scroll">$$y_1(t) = H - \frac{gt^2}{2} = 12{,}8 - 5t^2$$</div>
+              </li>
+              <li>Второй комок летит из начальной точки вертикально вверх:
+                <div class="math-scroll">$$y_2(t) = v_0 t - \frac{gt^2}{2} = 16t - 5t^2$$</div>
+              </li>
+            </ul>
+          </li>
+          <li>Найдем время до встречи $t_{\text{встр}}$, приравняв их координаты ($y_1 = y_2$):
+            <div class="math-scroll">
+              $$12{,}8 - 5t^2 = 16t - 5t^2 \implies 16t = 12{,}8 \implies t_{\text{встр}} = \frac{12{,}8}{16} = 0{,}8\text{ с}$$
+            </div>
+          </li>
+          <li>Найдем высоту встречи $h$ от точки бросания:
+            <div class="math-scroll">
+              $$h = y_2(0{,}8) = 16 \cdot 0{,}8 - 5 \cdot 0{,}8^2 = 12{,}8 - 3{,}2 = 9{,}6\text{ м} = 96\text{ дм}$$
+            </div>
+          </li>
+        </ol>
+        <strong>Ответ:</strong> 96.
+      </div>
+    </div>
+
+    <!-- Задача 21 (В7) -> image5.png в решении -->
+    <div class="card" id="task-21">
+      <div class="task-num">Задача 21</div>
+      <div class="task-title">Если дальность полета тела, брошенного в горизонтальном направлении со скоростью, модуль которой $v_0 = 15\text{ }\frac{\text{м}}{\text{с}}$, равна высоте бросания, то высота $h$, с которой брошено тело, равна ... м.</div>
+      <div class="task-desc">Введите высоту в метрах ($\text{м}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-21-input" />
+        <button class="btn-main" onclick="validateCalculation(21)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-21"></div>
+      <button class="btn-solution" id="btn-sol-21" onclick="toggleSolution(21)">Показать Решение</button>
+      <div class="solution-box" id="sol-21">
+        <p>На рисунке 396 показана траектория движения тела. Высота, с которой брошено тело, $h = \frac{gt^2}{2}$, где $t$ — время падения. Дальность полета $l = v_0 t$. Учитывая, что $h = l$, найдем ответ:</p>
+        <div class="math-scroll">
+          $$h = 45\text{ м}.$$
+        </div>
+        <div class="task-image-box">
+          <img src="image5.png" alt="Рис. 396" onerror="this.src='https://via.placeholder.com/300x200?text=image5.png';" />
+          <div class="img-caption">Рис. 396</div>
+        </div>
+        <strong>Ответ:</strong> 45.
+      </div>
+    </div>
+
+    <!-- Задача 22 (В8) -> image6.png в решении -->
+    <div class="card" id="task-22">
+      <div class="task-num">Задача 22</div>
+      <div class="task-title">Если камень, брошенный горизонтально с некоторой высоты со скоростью, модуль которой $v_0 = 54\text{ }\frac{\text{км}}{\text{ч}}$, упал на землю через промежуток времени $\Delta t = 2{,}0\text{ с}$, то модуль скорости $v$ камня в момент касания земли равен ... м/с.</div>
+      <div class="task-desc">Введите модуль скорости в метрах в секунду ($\text{м/с}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-22-input" />
+        <button class="btn-main" onclick="validateCalculation(22)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-22"></div>
+      <button class="btn-solution" id="btn-sol-22" onclick="toggleSolution(22)">Показать Решение</button>
+      <div class="solution-box" id="sol-22">
+        <p>Проекции скорости $\vec{v}$ (рис. 397) на оси $Ox$ и $Oy$ соответственно $v_x = v_0$ и $v_y = -g\Delta t$. Из прямоугольного треугольника следует:</p>
+        <div class="math-scroll">
+          $$v = \sqrt{(g\Delta t)^2 + v_0^2} = 25\text{ }\frac{\text{м}}{\text{с}}.$$
+        </div>
+        <div class="task-image-box">
+          <img src="image6.png" alt="Рис. 397" onerror="this.src='https://via.placeholder.com/300x200?text=image6.png';" />
+          <div class="img-caption">Рис. 397</div>
+        </div>
+        <strong>Ответ:</strong> 25.
+      </div>
+    </div>
+
+    <!-- Задача 23 (В10) -> image7.png в решении -->
+    <div class="card" id="task-23">
+      <div class="task-num">Задача 23</div>
+      <div class="task-title">С башни с высоты $h = 16{,}2\text{ м}$ в горизонтальном направлении бросили мяч. Если модуль перемещения мяча в момент падения на горизонтальную поверхность земли $\Delta r = 27\text{ м}$, то модуль начальной скорости $v_0$ движения мяча равен ... м/с.</div>
+      <div class="task-desc">Введите модуль начальной скорости в метрах в секунду ($\text{м/с}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-23-input" />
+        <button class="btn-main" onclick="validateCalculation(23)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-23"></div>
+      <button class="btn-solution" id="btn-sol-23" onclick="toggleSolution(23)">Показать Решение</button>
+      <div class="solution-box" id="sol-23">
+        <p>Из рисунка 399 следует: дальность полета мяча $l = \sqrt{(\Delta r)^2 - h^2} = 21{,}6\text{ м}$. Время его падения $t = \sqrt{\frac{2h}{g}} = 1{,}8\text{ с}$. Модуль начальной скорости, сообщенной мячу:</p>
+        <div class="math-scroll">
+          $$v_0 = \frac{l}{t} = 12\text{ }\frac{\text{м}}{\text{с}}.$$
+        </div>
+        <div class="task-image-box">
+          <img src="image7.png" alt="Рис. 399" onerror="this.src='https://via.placeholder.com/300x200?text=image7.png';" />
+          <div class="img-caption">Рис. 399</div>
+        </div>
+        <strong>Ответ:</strong> 12.
+      </div>
+    </div>
+
+    <!-- Задача 24 (ЦТ 2018) -->
+    <div class="card" id="task-24">
+      <div class="task-num">Задача 24</div>
+      <div class="task-title">Лифт начал подниматься с ускорением, модуль которого $a = 1{,}2\text{ м/с}^2$. Когда модуль скорости движения достиг $V = 2{,}0\text{ м/с}$, с потолка кабины лифта оторвался болт. Если высота кабины $h = 2{,}4\text{ м}$, то модуль перемещения $\Delta r$ болта относительно поверхности Земли за время его движения в лифте равен ... см. Ответ округлите до целых.</div>
+      <div class="task-desc">Введите модуль перемещения в сантиметрах ($\text{см}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-24-input" />
+        <button class="btn-main" onclick="validateCalculation(24)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-24"></div>
+      <button class="btn-solution" id="btn-sol-24" onclick="toggleSolution(24)">Показать Решение</button>
+      <div class="solution-box" id="sol-24">
+        <p>Во время падения болта лифт проходит некоторое расстояние, за счёт чего болт переместится относительно Земли на расстояние меньшее, чем высота кабины лифта. Относительно Земли болт движется с ускорением $g$, а вот относительно лифта его ускорение будет $g + a$. Начальная скорость болта относительно лифта равна нулю, поэтому время падения можно найти из уравнения:</p>
+        <div class="math-scroll">
+          $$h = \frac{(g + a)t^2}{2} \iff t = \sqrt{\frac{2h}{g + a}}.$$
+        </div>
+        <p>Относительно Земли болт движется с начальной скоростью, которая направлена вверх и равна $V$. Таким образом, за время падения в движущемся лифте болт переместится относительно Земли на расстояние, по модулю равное:</p>
+        <div class="math-scroll">
+          $$\Delta r = \left|Vt - \frac{gt^2}{2}\right| = \left|V\sqrt{\frac{2h}{g + a}} - \frac{2gh}{2(g + a)}\right| \approx 83\text{ см}.$$
+        </div>
+        <strong>Ответ:</strong> 83.
+      </div>
+    </div>
+
+    <!-- Задача 25 (ЦТ 2022) -->
+    <div class="card" id="task-25">
+      <div class="task-num">Задача 25</div>
+      <div class="task-title">Из одной точки с высоты $H$ бросили два тела в противоположные стороны. Начальные скорости тел направлены горизонтально, а их модули $v_1 = 5\text{ м/с}$ и $v_2 = 10\text{ м/с}$. Если расстояние между точками падения тел на горизонтальной поверхности земли $L = 45\text{ м}$, то чему равна высота $H$? Ответ приведите в метрах.</div>
+      <div class="task-desc">Введите высоту $H$ в метрах ($\text{м}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-25-input" />
+        <button class="btn-main" onclick="validateCalculation(25)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-25"></div>
+      <button class="btn-solution" id="btn-sol-25" onclick="toggleSolution(25)">Показать Решение</button>
+      <div class="solution-box" id="sol-25">
+        <p>При движении тела, брошенного горизонтально, по оси $Ox$ движение равномерное, по оси $Oy$ — равноускоренное без начальной скорости с ускорением свободного падения. Поэтому дальность полета каждого тела равна:</p>
+        <div class="math-scroll">
+          $$L_1 = v_1 t; \quad L_2 = v_2 t.$$
+        </div>
+        <p>Расстояние между точками падения $L = L_1 + L_2$. Отсюда время падения тел:</p>
+        <div class="math-scroll">
+          $$t = \frac{L}{v_1 + v_2} = \frac{45}{10 + 5} = 3\text{ с}.$$
+        </div>
+        <p>Тогда высота, с которой брошены оба тела, равна:</p>
+        <div class="math-scroll">
+          $$H = \frac{gt^2}{2} = \frac{10 \cdot 9}{2} = 45\text{ м}.$$
+        </div>
+        <strong>Ответ:</strong> 45.
+      </div>
+    </div>
+
+    <!-- Задача 26 (Задача ЦТ) -> image4.png -->
+    <div class="card" id="task-26">
+      <div class="task-num">Задача 26</div>
+      <div class="task-title">Тело бросили горизонтально с высоты $h = 5{,}0\text{ м}$ (см. рис.). В точке $A$ модуль мгновенной скорости $v$ тела равен ... дм/с. Ответ запишите в дециметрах за секунду, округлив до целых.</div>
+      <div class="task-image-box">
+        <img src="image4.png" alt="График траектории" onerror="this.src='https://via.placeholder.com/350x220?text=image4.png';" />
+      </div>
+      <div class="task-desc">Введите модуль мгновенной скорости в дециметрах в секунду ($\text{дм/с}$):</div>
+      <div class="input-action-row">
+        <input type="text" class="input-text" id="calc-26-input" />
+        <button class="btn-main" onclick="validateCalculation(26)">Проверить</button>
+      </div>
+      <div class="status-msg" id="status-26"></div>
+      <button class="btn-solution" id="btn-sol-26" onclick="toggleSolution(26)">Показать Решение</button>
+      <div class="solution-box" id="sol-26">
+        <p>Из формулы $h = \frac{gt^2}{2}$ выразим время падения тела:</p>
+        <div class="math-scroll">
+          $$t = \sqrt{\frac{2h}{g}} = \sqrt{\frac{2 \cdot 5}{10}} = 1\text{ с}.$$
+        </div>
+        <p>Тогда, зная дальность полета $x = 6\text{ м}$, найдем начальную скорость тела:</p>
+        <div class="math-scroll">
+          $$v_0 = \frac{x}{t} = \frac{6}{1} = 6\text{ м/с}.$$
+        </div>
+        <p>Тогда время движения тела до точки $A$ было равно $t_1 = 0{,}5\text{ с}$.<br/>
+        В точке $A$ проекции скорости $v_x = v_0$, $v_y = gt_1 = 10 \cdot 0{,}5 = 5\text{ м/с}$.<br/>
+        Тогда модуль мгновенной скорости в данной точке равен:</p>
+        <div class="math-scroll">
+          $$v_A = \sqrt{v_x^2 + v_y^2} = \sqrt{6^2 + 5^2} \approx 7{,}8\text{ м/с} = 78\text{ дм/с}.$$
+        </div>
+        <strong>Ответ:</strong> 78.
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Рендеринг формул KaTeX
+    function initMath() {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "$", right: "$", display: false }
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    const correctAnswers = {
+      1: ['4'],
+      2: ['4'],
+      3: ['4'],
+      4: ['3'],
+      5: ['4'],
+      9: ['4'],
+      10: ['4'],
+      11: ['4'],
+      12: ['3'],
+      13: ['1'],
+      14: ['5'],
+      15: ['5']
+    };
+
+    function handleChoice(taskId, value, buttonEl) {
+      const card = document.getElementById(`task-${taskId}`);
+      const buttons = card.querySelectorAll('.btn-option');
+      const status = document.getElementById(`status-${taskId}`);
+      const btnSol = document.getElementById(`btn-sol-${taskId}`);
+
+      buttons.forEach(b => b.classList.remove('correct', 'incorrect'));
+
+      const isCorrect = correctAnswers[taskId] && correctAnswers[taskId].includes(value);
+
+      if (isCorrect) {
+        buttonEl.classList.add('correct');
+        status.className = 'status-msg correct';
+        status.innerHTML = '✓ Верно! Отличная работа.';
+        btnSol.style.display = 'none';
+      } else {
+        buttonEl.classList.add('incorrect');
+        status.className = 'status-msg incorrect';
+        status.innerHTML = '✕ Неверно. Попробуйте еще раз или посмотрите решение.';
+        btnSol.style.display = 'inline-block';
+      }
+    }
+
+    function parseVal(str) {
+      if (!str) return NaN;
+      let s = str.trim().toLowerCase().replace(/\s+/g, '').replace(',', '.');
+      s = s.replace('·', '*').replace('x', '*').replace('х', '*');
+      s = s.replace(/10\^(\-?\d+)/g, '1e$1');
+      s = s.replace(/\*1e/g, 'e');
+      return parseFloat(s);
+    }
+
+    function validateCalculation(taskId) {
+      const inputEl = document.getElementById(`calc-${taskId}-input`);
+      const val = parseVal(inputEl.value);
+      const status = document.getElementById(`status-${taskId}`);
+      const btnSol = document.getElementById(`btn-sol-${taskId}`);
+      let isCorrect = false;
+
+      // Задача 6: 880 м
+      if (taskId === 6) isCorrect = Math.abs(val - 880) < 5;
+      // Задача 7: 80 м
+      else if (taskId === 7) isCorrect = Math.abs(val - 80) < 1;
+      // Задача 8: 40 м
+      else if (taskId === 8) isCorrect = Math.abs(val - 40) < 1;
+      // Задача 16: 16 м/с
+      else if (taskId === 16) isCorrect = Math.abs(val - 16) < 0.5;
+      // Задача 17: 14 дм (или 1.4 м)
+      else if (taskId === 17) isCorrect = Math.abs(val - 14) < 0.5 || Math.abs(val - 1.4) < 0.1;
+      // Задача 18: 15 м/с
+      else if (taskId === 18) isCorrect = Math.abs(val - 15) < 0.5;
+      // Задача 19: 25 м/с
+      else if (taskId === 19) isCorrect = Math.abs(val - 25) < 0.5;
+      // Задача 20: 96 дм (или 9.6 м)
+      else if (taskId === 20) isCorrect = Math.abs(val - 96) < 0.5 || Math.abs(val - 9.6) < 0.1;
+      // Задача 21: 45 м
+      else if (taskId === 21) isCorrect = Math.abs(val - 45) < 0.5;
+      // Задача 22: 25 м/с
+      else if (taskId === 22) isCorrect = Math.abs(val - 25) < 0.5;
+      // Задача 23: 12 м/с
+      else if (taskId === 23) isCorrect = Math.abs(val - 12) < 0.5;
+      // Задача 24: 83 см (или 0.83 м)
+      else if (taskId === 24) isCorrect = Math.abs(val - 83) < 1 || Math.abs(val - 0.83) < 0.05;
+      // Задача 25: 45 м
+      else if (taskId === 25) isCorrect = Math.abs(val - 45) < 0.5;
+      // Задача 26: 78 дм/с (или 7.8 м/с)
+      else if (taskId === 26) isCorrect = Math.abs(val - 78) < 1 || Math.abs(val - 7.8) < 0.2;
+
+      if (isCorrect) {
+        status.className = 'status-msg correct';
+        status.innerHTML = '✓ Правильно! Расчет выполнен верно.';
+        btnSol.style.display = 'none';
+      } else {
+        status.className = 'status-msg incorrect';
+        status.innerHTML = '✕ Не сходится. Перепроверьте расчет.';
+        btnSol.style.display = 'inline-block';
+      }
+    }
+
+    function toggleSolution(taskId) {
+      const box = document.getElementById(`sol-${taskId}`);
+      if (box.style.display === 'block') {
+        box.style.display = 'none';
+      } else {
+        box.style.display = 'block';
+        if (window.renderMathInElement) {
+          renderMathInElement(box, {
+            delimiters: [
+              { left: "$$", right: "$$", display: true },
+              { left: "$", right: "$", display: false }
+            ],
+            throwOnError: false
+          });
+        }
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(initMath, 200);
+    });
+  </script>
+</body>
+</html>
