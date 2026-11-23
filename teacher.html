@@ -112,62 +112,13 @@
     .stat-label { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.06em; }
     .stat-value { font-size: 26px; font-weight: 800; margin-top: 4px; font-family: var(--mono); }
 
-    /* Фильтр по группам */
-    .group-tabs {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 22px;
-    }
-    .group-tab {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      color: var(--text-sub);
-      padding: 9px 14px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 700;
-      font-family: inherit;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      transition: all 0.2s;
-    }
-    .group-tab:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
-    .group-tab.active {
-      background: rgba(99, 102, 241, 0.22);
-      border-color: rgba(99, 102, 241, 0.55);
-      color: #ffffff;
-      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.2);
-    }
-    .group-tab.tab-unknow.active {
-      background: rgba(245, 158, 11, 0.2);
-      border-color: rgba(245, 158, 11, 0.55);
-      color: #fde68a;
-    }
-    .tab-count {
-      font-family: var(--mono);
-      font-size: 11px;
-      padding: 2px 7px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    /* Блоки рейтингов по группам */
-    .ratings-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
     .panel {
       background: var(--surface-card);
       border: 1px solid var(--border);
       border-radius: 22px;
       padding: 20px;
       backdrop-filter: blur(24px);
+      margin-bottom: 20px;
     }
     .panel-head {
       display: flex;
@@ -186,37 +137,29 @@
       font-weight: 800;
       padding: 3px 9px;
       border-radius: 999px;
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      color: #bae6fd;
+      border: 1px solid transparent;
       white-space: nowrap;
     }
-    .group-badge.gb-in {
-      background: rgba(168, 85, 247, 0.16);
-      border-color: rgba(168, 85, 247, 0.35);
-      color: #e9d5ff;
-    }
-    .group-badge.gb-unknow {
-      background: rgba(245, 158, 11, 0.16);
-      border-color: rgba(245, 158, 11, 0.35);
-      color: #fde68a;
-    }
 
-    /* Строки рейтинга */
-    .rank-list { display: flex; flex-direction: column; gap: 8px; }
+    /* ТОП-3 общий по всем ученикам */
+    .top3-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
     .rank-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 11px 13px;
-      border-radius: 14px;
+      padding: 13px 14px;
+      border-radius: 16px;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.06);
     }
     .rank-row.top-1 {
-      background: linear-gradient(90deg, rgba(250, 204, 21, 0.12), rgba(255, 255, 255, 0.03));
-      border-color: rgba(250, 204, 21, 0.3);
+      background: linear-gradient(90deg, rgba(250, 204, 21, 0.13), rgba(255, 255, 255, 0.03));
+      border-color: rgba(250, 204, 21, 0.32);
     }
     .rank-row.top-2 {
       background: linear-gradient(90deg, rgba(203, 213, 225, 0.11), rgba(255, 255, 255, 0.03));
@@ -228,23 +171,63 @@
     }
     .rank-left { display: flex; align-items: center; gap: 11px; min-width: 0; }
     .rank-pos {
-      width: 30px;
-      height: 30px;
-      border-radius: 9px;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: var(--mono);
       font-weight: 800;
-      font-size: 13px;
+      font-size: 16px;
       background: rgba(255, 255, 255, 0.07);
       flex-shrink: 0;
     }
     .rank-name { font-weight: 700; font-size: 14px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .rank-sub { font-size: 11px; color: var(--text-muted); font-family: var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .rank-sub { font-size: 11px; color: var(--text-muted); font-family: var(--mono); margin-top: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .rank-metrics { text-align: right; flex-shrink: 0; }
     .rank-score { font-family: var(--mono); font-weight: 800; font-size: 15px; color: #6ee7b7; }
     .rank-extra { font-size: 11px; color: var(--text-sub); font-family: var(--mono); }
+
+    /* Фильтр по группам для таблицы ДЗ */
+    .group-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .group-tab {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-sub);
+      padding: 8px 13px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s;
+    }
+    .group-tab:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+    .group-tab.active {
+      color: #ffffff;
+    }
+    .tab-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .tab-count {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+    }
 
     /* Таблица ДЗ */
     .table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); -webkit-overflow-scrolling: touch; }
@@ -317,7 +300,7 @@
     .task-meta { font-size: 12px; color: var(--text-sub); font-family: var(--mono); }
 
     @media (max-width: 520px) {
-      .ratings-grid { grid-template-columns: 1fr; }
+      .top3-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -383,12 +366,6 @@
       return window.PhysAuth ? window.PhysAuth.escapeHtml(s) : String(s ?? "");
     }
 
-    function getGroupBadgeClass(groupKey) {
-      if (groupKey === "IN") return "group-badge gb-in";
-      if (groupKey === "UNKNOW") return "group-badge gb-unknow";
-      return "group-badge";
-    }
-
     function formatStudentPrimaryName(st) {
       if (st.displayName) return st.displayName;
       if (st.parsed?.valid) {
@@ -448,7 +425,7 @@
         return;
       }
 
-      root.innerHTML = `<div class="denied-box"><h2>Загружаем ответы...</h2><p>Читаем базу учеников и формируем рейтинги по группам</p></div>`;
+      root.innerHTML = `<div class="denied-box"><h2>Загружаем ответы...</h2><p>Читаем базу учеников и формируем ТОП-3</p></div>`;
 
       try {
         const snap = await PA.getDb().collection("students").get();
@@ -464,15 +441,17 @@
 
         DZ_LIST = await buildDzList(allStudents);
 
-        // Фоново синхронизируем коллекцию ratings, чтобы у учеников сразу был актуальный рейтинг
+        // Фоново синхронизируем коллекцию ratings без секретных полей
+        const del = firebase.firestore.FieldValue.delete();
         allStudents.forEach((st) => {
           const rPayload = {
-            login: st.login,
             groupKey: st.parsed.groupKey,
             groupLabel: st.parsed.groupLabel,
-            studentNum: st.parsed.studentNum,
-            grade: st.parsed.grade,
-            code: st.parsed.code,
+            grade: st.parsed.grade || null,
+            login: del,
+            email: del,
+            studentNum: del,
+            code: del,
             ...st.stats,
             updatedAt: st.updatedAt || new Date().toISOString()
           };
@@ -511,7 +490,6 @@
       const root = document.getElementById("app-root");
       const PA = window.PhysAuth;
 
-      // Группируем всех учеников по их groupKey
       const groupsMap = new Map();
       allStudents.forEach((st) => {
         const gKey = st.parsed.groupKey;
@@ -537,75 +515,63 @@
       });
       const avgPct = totalSolved ? Math.round((totalCorrect / totalSolved) * 100) : 0;
 
-      // Кнопки переключения групп
+      // Общий ТОП-3 среди ВСЕХ учеников
+      const top3 = sortForRanking(allStudents.filter((st) => st.stats.totalCorrect > 0)).slice(0, 3);
+      let top3Html = "";
+      if (top3.length === 0) {
+        top3Html = `<div style="color:#94a3b8; font-size:14px;">Пока никто из учеников не решил ни одной задачи верно.</div>`;
+      } else {
+        top3Html = `<div class="top3-grid">` + top3
+          .map((st, idx) => {
+            const pos = idx + 1;
+            const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : "🥉";
+            const pct = st.stats.totalSolved
+              ? Math.round((st.stats.totalCorrect / st.stats.totalSolved) * 100)
+              : 0;
+            const badgeStyle = PA.getGroupBadgeStyleAttr(st.parsed.groupKey);
+            const codeInfo = st.parsed.valid ? `${st.parsed.grade} кл · ${st.parsed.code}` : st.login;
+
+            return `
+              <div class="rank-row top-${pos}">
+                <div class="rank-left">
+                  <div class="rank-pos">${medal}</div>
+                  <div style="min-width:0">
+                    <div class="rank-name">${esc(formatStudentPrimaryName(st))}</div>
+                    <div class="rank-sub">
+                      <span class="group-badge" style="${badgeStyle}">${esc(st.parsed.groupLabel)}</span>
+                      <span>${esc(codeInfo)}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="rank-metrics">
+                  <div class="rank-score">${st.stats.totalCorrect} верно</div>
+                  <div class="rank-extra">с 1-й поп: ${st.stats.firstTryCorrect} · ${pct}%</div>
+                </div>
+              </div>
+            `;
+          })
+          .join("") + `</div>`;
+      }
+
+      // Вкладки фильтра по группам для таблицы ДЗ (каждая со своим цветом)
       const groupTabsHtml = [
-        `<button class="group-tab ${selectedGroup === "ALL" ? "active" : ""}" data-group="ALL" type="button">
+        `<button class="group-tab ${selectedGroup === "ALL" ? "active" : ""}" style="${selectedGroup === "ALL" ? "background:rgba(99,102,241,0.22); border-color:rgba(99,102,241,0.55);" : ""}" data-group="ALL" type="button">
           Все группы <span class="tab-count">${allStudents.length}</span>
         </button>`,
         ...orderedGroupKeys.map((gKey) => {
           const g = groupsMap.get(gKey);
-          const extraCls = gKey === "UNKNOW" ? "tab-unknow" : "";
+          const c = PA.getGroupStyle(gKey);
+          const isActive = selectedGroup === gKey;
+          const activeStyle = isActive ? `background:${c.bg}; border-color:${c.border}; color:${c.text};` : "";
           return `
-            <button class="group-tab ${extraCls} ${selectedGroup === gKey ? "active" : ""}" data-group="${esc(gKey)}" type="button">
+            <button class="group-tab ${isActive ? "active" : ""}" style="${activeStyle}" data-group="${esc(gKey)}" type="button">
+              <span class="tab-dot" style="background:${c.accent}; box-shadow:0 0 8px ${c.accent};"></span>
               ${esc(g.label)} <span class="tab-count">${g.students.length}</span>
             </button>
           `;
         })
       ].join("");
 
-      // Карточки рейтингов (отдельно по каждой группе)
-      const groupsToRank = selectedGroup === "ALL" ? orderedGroupKeys : [selectedGroup];
-      const ratingsHtml = groupsToRank
-        .map((gKey) => {
-          const g = groupsMap.get(gKey);
-          if (!g) return "";
-          const ranked = sortForRanking(g.students);
-
-          const rows = ranked
-            .map((st, idx) => {
-              const pos = idx + 1;
-              const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : pos;
-              const topCls = pos <= 3 && st.stats.totalCorrect > 0 ? `top-${pos}` : "";
-              const pct = st.stats.totalSolved
-                ? Math.round((st.stats.totalCorrect / st.stats.totalSolved) * 100)
-                : 0;
-              const subInfo = st.parsed.valid
-                ? `${st.parsed.grade} кл · №${st.parsed.studentNum} · ${st.parsed.code}`
-                : st.login;
-
-              return `
-                <div class="rank-row ${topCls}">
-                  <div class="rank-left">
-                    <div class="rank-pos">${medal}</div>
-                    <div style="min-width:0">
-                      <div class="rank-name">${esc(formatStudentPrimaryName(st))}</div>
-                      <div class="rank-sub">${esc(subInfo)}</div>
-                    </div>
-                  </div>
-                  <div class="rank-metrics">
-                    <div class="rank-score">${st.stats.totalCorrect} верно</div>
-                    <div class="rank-extra">с 1-й поп: ${st.stats.firstTryCorrect} · ${pct}%</div>
-                  </div>
-                </div>
-              `;
-            })
-            .join("");
-
-          return `
-            <div class="panel">
-              <div class="panel-head">
-                <div class="panel-title">
-                  🏆 Рейтинг: <span class="${getGroupBadgeClass(g.key)}">${esc(g.label)}</span>
-                </div>
-                <span class="panel-hint">${ranked.length} уч.</span>
-              </div>
-              <div class="rank-list">${rows}</div>
-            </div>
-          `;
-        })
-        .join("");
-
-      // Таблица по ДЗ (отсортирована по рейтингу выбранных учеников)
       const headerCols = DZ_LIST.map((d) => {
         const num = d.key.replace(/\D/g, "");
         return `<th title="${esc(d.title)}">ДЗ ${esc(num)}</th>`;
@@ -617,13 +583,14 @@
         rowsHtml = `
           <tr>
             <td colspan="${DZ_LIST.length + 1}" style="text-align:center; padding:30px; color:#94a3b8;">
-              Пока ни один ученик из этой группы не заходил на сайт.
+              Пока ни один ученик не заходил на сайт.
             </td>
           </tr>
         `;
       } else {
         rowsHtml = sortedTableStudents
           .map((st) => {
+            const badgeStyle = PA.getGroupBadgeStyleAttr(st.parsed.groupKey);
             const cells = DZ_LIST.map((dz) => {
               const tasks = st.dz?.[dz.key];
               if (!tasks || Object.keys(tasks).length === 0) {
@@ -645,8 +612,8 @@
                   <div class="student-cell">
                     <div>
                       <div class="student-name">${esc(formatStudentPrimaryName(st))}</div>
-                      <div style="display:flex; align-items:center; gap:6px; margin-top:3px; flex-wrap:wrap;">
-                        <span class="${getGroupBadgeClass(st.parsed.groupKey)}">${esc(st.parsed.groupLabel)}</span>
+                      <div style="display:flex; align-items:center; gap:6px; margin-top:4px; flex-wrap:wrap;">
+                        <span class="group-badge" style="${badgeStyle}">${esc(st.parsed.groupLabel)}</span>
                         <span class="student-login">${esc(st.parsed.raw)}</span>
                       </div>
                     </div>
@@ -680,9 +647,13 @@
           </div>
         </div>
 
-        <div class="group-tabs">${groupTabsHtml}</div>
-
-        ${orderedGroupKeys.length ? `<div class="ratings-grid">${ratingsHtml}</div>` : ""}
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">🏆 ТОП-3 лучших (из всех учеников)</div>
+            <span class="panel-hint">Общий зачёт по всем группам</span>
+          </div>
+          ${top3Html}
+        </div>
 
         <div class="panel">
           <div class="panel-head">
@@ -691,6 +662,9 @@
               <div class="panel-hint">Нажмите на ячейку с баллами, чтобы увидеть каждую задачу и количество попыток</div>
             </div>
           </div>
+
+          <div class="group-tabs">${groupTabsHtml}</div>
+
           <div class="table-wrap">
             <table>
               <thead>
