@@ -32,6 +32,54 @@
   let origHandleChoice = null;
   let origValidateCalculation = null;
 
+  const GROUP_PALETTE = [
+    // 01: Голубой
+    { bg: "rgba(56, 189, 248, 0.15)", border: "rgba(56, 189, 248, 0.38)", text: "#bae6fd", accent: "#38bdf8" },
+    // 02: Изумрудно-зелёный
+    { bg: "rgba(16, 185, 129, 0.16)", border: "rgba(16, 185, 129, 0.40)", text: "#6ee7b7", accent: "#10b981" },
+    // 03: Розово-малиновый
+    { bg: "rgba(244, 63, 94, 0.16)", border: "rgba(244, 63, 94, 0.40)", text: "#fda4af", accent: "#f43f5e" },
+    // 04: Индиго
+    { bg: "rgba(99, 102, 241, 0.18)", border: "rgba(99, 102, 241, 0.44)", text: "#c7d2fe", accent: "#6366f1" },
+    // 05: Бирюзовый
+    { bg: "rgba(20, 184, 166, 0.16)", border: "rgba(20, 184, 166, 0.40)", text: "#99f6e4", accent: "#14b8a6" },
+    // 06: Оранжевый
+    { bg: "rgba(249, 115, 22, 0.16)", border: "rgba(249, 115, 22, 0.40)", text: "#fed7aa", accent: "#f97316" },
+    // 07: Фуксия
+    { bg: "rgba(236, 72, 153, 0.16)", border: "rgba(236, 72, 153, 0.40)", text: "#fbcfe8", accent: "#ec4899" },
+    // 08: Лаймовый
+    { bg: "rgba(132, 204, 22, 0.16)", border: "rgba(132, 204, 22, 0.40)", text: "#d9f99d", accent: "#84cc16" }
+  ];
+
+  function getGroupStyle(groupKey) {
+    const key = String(groupKey || "UNKNOW").toUpperCase();
+    if (key === "UNKNOW") {
+      return { bg: "rgba(245, 158, 11, 0.16)", border: "rgba(245, 158, 11, 0.40)", text: "#fde68a", accent: "#f59e0b" };
+    }
+    if (key === "IN") {
+      return { bg: "rgba(168, 85, 247, 0.17)", border: "rgba(168, 85, 247, 0.42)", text: "#e9d5ff", accent: "#a855f7" };
+    }
+    const num = parseInt(key, 10);
+    if (!isNaN(num) && num >= 1) {
+      if (num <= GROUP_PALETTE.length) {
+        return GROUP_PALETTE[num - 1];
+      }
+      const hue = Math.round(((num - 1) * 137.508) % 360);
+      return {
+        bg: `hsla(${hue}, 78%, 55%, 0.16)`,
+        border: `hsla(${hue}, 78%, 60%, 0.40)`,
+        text: `hsl(${hue}, 85%, 82%)`,
+        accent: `hsl(${hue}, 78%, 60%)`
+      };
+    }
+    return { bg: "rgba(245, 158, 11, 0.16)", border: "rgba(245, 158, 11, 0.40)", text: "#fde68a", accent: "#f59e0b" };
+  }
+
+  function getGroupBadgeStyleAttr(groupKey) {
+    const c = getGroupStyle(groupKey);
+    return `background:${c.bg}; border-color:${c.border}; color:${c.text};`;
+  }
+
   function escapeHtml(str) {
     return String(str ?? "")
       .replace(/&/g, "&amp;")
@@ -54,7 +102,6 @@
     return clean.includes("@") ? clean : `${clean}@${LOGIN_DOMAIN}`;
   }
 
-  // Разбор логина вида 0003PHYS20261101A98H
   function parseStudentLogin(raw) {
     const clean = String(raw || "").trim().toUpperCase();
     const m = clean.match(/^(\d{4})(PHYS)(\d{4})(\d{2})(IN|0[1-9]|[1-9]\d)([A-Z0-9]{4})$/);
@@ -118,19 +165,22 @@
     return { totalCorrect, firstTryCorrect, totalSolved, totalAttempts };
   }
 
+  // В публичную коллекцию ratings пишем ТОЛЬКО безопасные поля (без login, studentNum, code и email)
   async function syncPublicRating(user, docData) {
     if (!user || !fbDb || user.email === TEACHER_EMAIL) return;
     const loginName = getLoginFromEmail(user.email);
     const parsed = parseStudentLogin(loginName);
     const stats = computeRatingStats(docData);
+    const del = firebase.firestore.FieldValue.delete();
 
     const payload = {
-      login: loginName,
       groupKey: parsed.groupKey,
       groupLabel: parsed.groupLabel,
-      studentNum: parsed.studentNum,
-      grade: parsed.grade,
-      code: parsed.code,
+      grade: parsed.grade || null,
+      login: del,
+      email: del,
+      studentNum: del,
+      code: del,
       ...stats,
       updatedAt: new Date().toISOString()
     };
@@ -141,7 +191,6 @@
     try {
       await fbDb.collection("ratings").doc(user.uid).set(payload, { merge: true });
     } catch (err) {
-      // Не мешаем работе, если правило для ratings ещё не добавлено
       console.warn("syncPublicRating:", err?.code || err);
     }
   }
@@ -310,12 +359,10 @@
       }
       .phys-group-tag {
         font-size: 11px;
-        font-weight: 700;
-        padding: 3px 9px;
+        font-weight: 800;
+        padding: 3px 10px;
         border-radius: 999px;
-        background: rgba(56, 189, 248, 0.14);
-        border: 1px solid rgba(56, 189, 248, 0.3);
-        color: #bae6fd;
+        border: 1px solid transparent;
         white-space: nowrap;
       }
       .phys-score-chip {
@@ -486,7 +533,7 @@
     if (user.email === TEACHER_EMAIL) return "Учитель";
     const parsed = parseStudentLogin(login);
     if (parsed.valid) {
-      return `Ученик №${Number(parsed.studentNum)} (${parsed.code})`;
+      return `Ученик №${Number(parsed.studentNum)}`;
     }
     return login;
   }
@@ -524,7 +571,7 @@
         </div>
         <div class="phys-topbar-right">
           ${teacherLink}
-          <span class="phys-user-chip" title="${escapeHtml(parsed.raw)}">${escapeHtml(displayName)}</span>
+          <span class="phys-user-chip">${escapeHtml(displayName)}</span>
           <button class="phys-pill-btn" id="phys-logout-btn" type="button">Выйти</button>
         </div>
       `;
@@ -541,12 +588,12 @@
       }
 
       const groupTag = !isTeacher
-        ? `<span class="phys-group-tag">${escapeHtml(parsed.groupLabel)}</span>`
+        ? `<span class="phys-group-tag" style="${getGroupBadgeStyleAttr(parsed.groupKey)}">${escapeHtml(parsed.groupLabel)}</span>`
         : "";
 
       bar.innerHTML = `
         <div class="phys-topbar-left">
-          <span class="phys-user-chip" style="max-width:210px" title="${escapeHtml(parsed.raw)}">👤 ${escapeHtml(displayName)}</span>
+          <span class="phys-user-chip" style="max-width:210px">👤 ${escapeHtml(displayName)}</span>
           ${groupTag}
         </div>
         <div class="phys-topbar-right">
@@ -790,6 +837,8 @@
         getLoginFromEmail,
         parseStudentLogin,
         sortGroupKeys,
+        getGroupStyle,
+        getGroupBadgeStyleAttr,
         computeRatingStats,
         escapeHtml
       };
