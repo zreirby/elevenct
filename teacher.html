@@ -98,7 +98,7 @@
 
     .stats-row {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      grid-template-columns: minmax(180px, 240px);
       gap: 14px;
       margin-bottom: 20px;
     }
@@ -183,10 +183,10 @@
       flex-shrink: 0;
     }
     .rank-name { font-weight: 700; font-size: 14px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .rank-sub { font-size: 11px; color: var(--text-muted); font-family: var(--mono); margin-top: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .rank-sub { margin-top: 4px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .rank-metrics { text-align: right; flex-shrink: 0; }
-    .rank-score { font-family: var(--mono); font-weight: 800; font-size: 15px; color: #6ee7b7; }
-    .rank-extra { font-size: 11px; color: var(--text-sub); font-family: var(--mono); }
+    .rank-score { font-family: var(--mono); font-weight: 800; font-size: 15px; color: #6ee7b7; white-space: nowrap; }
+    .rank-extra { font-size: 11px; color: var(--text-sub); font-family: var(--mono); white-space: nowrap; }
 
     .group-tabs {
       display: flex;
@@ -290,6 +290,7 @@
     .task-meta { font-size: 12px; color: var(--text-sub); font-family: var(--mono); }
 
     @media (max-width: 520px) {
+      .stats-row { grid-template-columns: 1fr; }
       .top3-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -516,7 +517,6 @@
 
         DZ_LIST = await buildDzList(allStudents);
 
-        // Фоново синхронизируем коллекцию ratings без секретных полей
         const del = firebase.firestore.FieldValue.delete();
         allStudents.forEach((st) => {
           const rPayload = {
@@ -555,6 +555,22 @@
       });
     }
 
+    // Сортировка таблицы: сначала по группам (01, 02, ..., IN, UNKNOW в конце), внутри группы по алфавиту
+    function sortForTable(list) {
+      const groupRank = (gKey) => {
+        if (gKey === "UNKNOW") return 999999;
+        if (gKey === "IN") return 500000;
+        const n = parseInt(gKey, 10);
+        return isNaN(n) ? 999998 : n;
+      };
+      return [...list].sort((a, b) => {
+        const ga = groupRank(a.parsed.groupKey);
+        const gb = groupRank(b.parsed.groupKey);
+        if (ga !== gb) return ga - gb;
+        return formatStudentPrimaryName(a).localeCompare(formatStudentPrimaryName(b), "ru");
+      });
+    }
+
     function renderDashboard() {
       const root = document.getElementById("app-root");
 
@@ -575,14 +591,6 @@
       const visibleStudents =
         selectedGroup === "ALL" ? allStudents : (groupsMap.get(selectedGroup)?.students || []);
 
-      let totalSolved = 0;
-      let totalCorrect = 0;
-      visibleStudents.forEach((st) => {
-        totalSolved += st.stats.totalSolved;
-        totalCorrect += st.stats.totalCorrect;
-      });
-      const avgPct = totalSolved ? Math.round((totalCorrect / totalSolved) * 100) : 0;
-
       const top3 = sortForRanking(allStudents.filter((st) => st.stats.totalCorrect > 0)).slice(0, 3);
       let top3Html = "";
       if (top3.length === 0) {
@@ -592,11 +600,7 @@
           .map((st, idx) => {
             const pos = idx + 1;
             const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : "🥉";
-            const pct = st.stats.totalSolved
-              ? Math.round((st.stats.totalCorrect / st.stats.totalSolved) * 100)
-              : 0;
             const badgeStyle = safeGetGroupBadgeStyleAttr(st.parsed.groupKey);
-            const codeInfo = st.parsed.valid ? `${st.parsed.grade} кл · ${st.parsed.code}` : st.login;
 
             return `
               <div class="rank-row top-${pos}">
@@ -606,13 +610,12 @@
                     <div class="rank-name">${esc(formatStudentPrimaryName(st))}</div>
                     <div class="rank-sub">
                       <span class="group-badge" style="${badgeStyle}">${esc(st.parsed.groupLabel)}</span>
-                      <span>${esc(codeInfo)}</span>
                     </div>
                   </div>
                 </div>
                 <div class="rank-metrics">
                   <div class="rank-score">${st.stats.totalCorrect} верно</div>
-                  <div class="rank-extra">с 1-й поп: ${st.stats.firstTryCorrect} · ${pct}%</div>
+                  <div class="rank-extra">с 1 попытки: ${st.stats.firstTryCorrect}</div>
                 </div>
               </div>
             `;
@@ -643,7 +646,7 @@
         return `<th title="${esc(d.title)}">ДЗ ${esc(num)}</th>`;
       }).join("");
 
-      const sortedTableStudents = sortForRanking(visibleStudents);
+      const sortedTableStudents = sortForTable(visibleStudents);
       let rowsHtml = "";
       if (sortedTableStudents.length === 0) {
         rowsHtml = `
@@ -696,20 +699,8 @@
       root.innerHTML = `
         <div class="stats-row">
           <div class="stat-card">
-            <div class="stat-label">Учеников</div>
+            <div class="stat-label">Учащихся</div>
             <div class="stat-value">${visibleStudents.length}</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Групп</div>
-            <div class="stat-value">${orderedGroupKeys.length}</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Всего ответов</div>
-            <div class="stat-value">${totalSolved}</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Верных ответов</div>
-            <div class="stat-value" style="color:#34d399">${avgPct}%</div>
           </div>
         </div>
 
@@ -810,7 +801,7 @@
             const attemptWarn =
               e.attempts > 1
                 ? `<span class="badge-warn">Попыток: ${e.attempts}${e.firstCorrect ? "" : " (1-я: ✕)"}</span>`
-                : `<span class="task-meta">с 1-й попытки</span>`;
+                : `<span class="task-meta">с 1 попытки</span>`;
             const dt = e.updatedAt
               ? new Date(e.updatedAt).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
               : "";
@@ -872,9 +863,9 @@
     });
 
     document.getElementById("btn-csv").addEventListener("click", () => {
-      const headers = ["Группа", "Ученик", "Логин", "Верно всего", "С 1-й попытки", ...DZ_LIST.map((d) => d.title)];
+      const headers = ["Группа", "Ученик", "Логин", "Верно всего", "С 1 попытки", ...DZ_LIST.map((d) => d.title)];
       const rows = [headers];
-      sortForRanking(allStudents).forEach((st) => {
+      sortForTable(allStudents).forEach((st) => {
         const line = [
           st.parsed.groupLabel,
           formatStudentPrimaryName(st),
