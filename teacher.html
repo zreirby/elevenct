@@ -85,7 +85,7 @@
     main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 60px; }
 
     .denied-box {
-      max-width: 460px;
+      max-width: 500px;
       margin: 60px auto;
       background: var(--surface-card);
       border: 1px solid var(--border);
@@ -94,7 +94,7 @@
       text-align: center;
     }
     .denied-box h2 { margin-bottom: 10px; }
-    .denied-box p { color: var(--text-sub); margin-bottom: 20px; font-size: 14px; }
+    .denied-box p { color: var(--text-sub); margin-bottom: 14px; font-size: 14px; }
 
     .stats-row {
       display: grid;
@@ -141,7 +141,6 @@
       white-space: nowrap;
     }
 
-    /* ТОП-3 общий по всем ученикам */
     .top3-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -189,7 +188,6 @@
     .rank-score { font-family: var(--mono); font-weight: 800; font-size: 15px; color: #6ee7b7; }
     .rank-extra { font-size: 11px; color: var(--text-sub); font-family: var(--mono); }
 
-    /* Фильтр по группам для таблицы ДЗ */
     .group-tabs {
       display: flex;
       gap: 8px;
@@ -212,15 +210,8 @@
       transition: all 0.2s;
     }
     .group-tab:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
-    .group-tab.active {
-      color: #ffffff;
-    }
-    .tab-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+    .group-tab.active { color: #ffffff; }
+    .tab-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .tab-count {
       font-family: var(--mono);
       font-size: 11px;
@@ -229,7 +220,6 @@
       background: rgba(255, 255, 255, 0.1);
     }
 
-    /* Таблица ДЗ */
     .table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); -webkit-overflow-scrolling: touch; }
     table { width: 100%; border-collapse: collapse; min-width: 820px; font-size: 13px; }
     th, td { padding: 11px 10px; border-bottom: 1px solid var(--border); border-right: 1px solid rgba(255, 255, 255, 0.04); text-align: center; }
@@ -342,7 +332,7 @@
     </div>
   </div>
 
-  <script src="auth.js"></script>
+  <script src="auth.js?v=4"></script>
   <script>
     const DEFAULT_DZ_LIST = [
       { key: "dz1", title: "ДЗ 1 • РПД" },
@@ -357,6 +347,17 @@
       { key: "dz10", title: "ДЗ 10 • Работа. Мощность" }
     ];
 
+    const FALLBACK_PALETTE = [
+      { bg: "rgba(56, 189, 248, 0.15)", border: "rgba(56, 189, 248, 0.38)", text: "#bae6fd", accent: "#38bdf8" },
+      { bg: "rgba(16, 185, 129, 0.16)", border: "rgba(16, 185, 129, 0.40)", text: "#6ee7b7", accent: "#10b981" },
+      { bg: "rgba(244, 63, 94, 0.16)", border: "rgba(244, 63, 94, 0.40)", text: "#fda4af", accent: "#f43f5e" },
+      { bg: "rgba(99, 102, 241, 0.18)", border: "rgba(99, 102, 241, 0.44)", text: "#c7d2fe", accent: "#6366f1" },
+      { bg: "rgba(20, 184, 166, 0.16)", border: "rgba(20, 184, 166, 0.40)", text: "#99f6e4", accent: "#14b8a6" },
+      { bg: "rgba(249, 115, 22, 0.16)", border: "rgba(249, 115, 22, 0.40)", text: "#fed7aa", accent: "#f97316" },
+      { bg: "rgba(236, 72, 153, 0.16)", border: "rgba(236, 72, 153, 0.40)", text: "#fbcfe8", accent: "#ec4899" },
+      { bg: "rgba(132, 204, 22, 0.16)", border: "rgba(132, 204, 22, 0.40)", text: "#d9f99d", accent: "#84cc16" }
+    ];
+
     let DZ_LIST = [...DEFAULT_DZ_LIST];
     let allStudents = [];
     let selectedGroup = "ALL";
@@ -364,6 +365,66 @@
 
     function esc(s) {
       return window.PhysAuth ? window.PhysAuth.escapeHtml(s) : String(s ?? "");
+    }
+
+    function safeGetGroupStyle(groupKey) {
+      if (window.PhysAuth?.getGroupStyle) return window.PhysAuth.getGroupStyle(groupKey);
+      const key = String(groupKey || "UNKNOW").toUpperCase();
+      if (key === "UNKNOW") return { bg: "rgba(245, 158, 11, 0.16)", border: "rgba(245, 158, 11, 0.40)", text: "#fde68a", accent: "#f59e0b" };
+      if (key === "IN") return { bg: "rgba(168, 85, 247, 0.17)", border: "rgba(168, 85, 247, 0.42)", text: "#e9d5ff", accent: "#a855f7" };
+      const num = parseInt(key, 10);
+      if (!isNaN(num) && num >= 1) {
+        if (num <= FALLBACK_PALETTE.length) return FALLBACK_PALETTE[num - 1];
+        const hue = Math.round(((num - 1) * 137.508) % 360);
+        return { bg: `hsla(${hue},78%,55%,0.16)`, border: `hsla(${hue},78%,60%,0.40)`, text: `hsl(${hue},85%,82%)`, accent: `hsl(${hue},78%,60%)` };
+      }
+      return { bg: "rgba(245, 158, 11, 0.16)", border: "rgba(245, 158, 11, 0.40)", text: "#fde68a", accent: "#f59e0b" };
+    }
+
+    function safeGetGroupBadgeStyleAttr(groupKey) {
+      if (window.PhysAuth?.getGroupBadgeStyleAttr) return window.PhysAuth.getGroupBadgeStyleAttr(groupKey);
+      const c = safeGetGroupStyle(groupKey);
+      return `background:${c.bg}; border-color:${c.border}; color:${c.text};`;
+    }
+
+    function safeParseLogin(raw) {
+      if (window.PhysAuth?.parseStudentLogin) return window.PhysAuth.parseStudentLogin(raw);
+      const clean = String(raw || "").trim().toUpperCase();
+      const m = clean.match(/^(\d{4})(PHYS)(\d{4})(\d{2})(IN|0[1-9]|[1-9]\d)([A-Z0-9]{4})$/);
+      if (!m) return { valid: false, raw: clean, groupKey: "UNKNOW", groupLabel: "UNKNOW", studentNum: null, grade: null, code: null };
+      const [, studentNum, , , grade, groupToken, code] = m;
+      return {
+        valid: true, raw: clean, groupKey: groupToken,
+        groupLabel: groupToken === "IN" ? "Индивидуально (IN)" : `Группа №${parseInt(groupToken, 10)}`,
+        studentNum, grade, code
+      };
+    }
+
+    function safeSortGroupKeys(keys) {
+      if (window.PhysAuth?.sortGroupKeys) return window.PhysAuth.sortGroupKeys(keys);
+      return [...keys].sort((a, b) => {
+        if (a === b) return 0;
+        if (a === "UNKNOW") return 1;
+        if (b === "UNKNOW") return -1;
+        if (a === "IN") return 1;
+        if (b === "IN") return -1;
+        return Number(a) - Number(b);
+      });
+    }
+
+    function safeComputeStats(docData) {
+      if (window.PhysAuth?.computeRatingStats) return window.PhysAuth.computeRatingStats(docData);
+      let totalCorrect = 0, firstTryCorrect = 0, totalSolved = 0, totalAttempts = 0;
+      Object.values(docData?.dz || {}).forEach((tasks) => {
+        Object.values(tasks || {}).forEach((t) => {
+          if (!t) return;
+          totalSolved++;
+          totalAttempts += Number(t.attempts || 1);
+          if (t.isCorrect) totalCorrect++;
+          if (t.firstCorrect) firstTryCorrect++;
+        });
+      });
+      return { totalCorrect, firstTryCorrect, totalSolved, totalAttempts };
     }
 
     function formatStudentPrimaryName(st) {
@@ -427,15 +488,29 @@
 
       root.innerHTML = `<div class="denied-box"><h2>Загружаем ответы...</h2><p>Читаем базу учеников и формируем ТОП-3</p></div>`;
 
+      let snap;
       try {
-        const snap = await PA.getDb().collection("students").get();
+        snap = await PA.getDb().collection("students").get();
+      } catch (err) {
+        console.error("Firestore read error:", err);
+        root.innerHTML = `
+          <div class="denied-box">
+            <h2>Ошибка чтения базы</h2>
+            <p>Проверьте правила Firestore (раздел Rules) и авторизацию учителя.</p>
+            <p style="font-family:var(--mono); font-size:12px; color:#fda4af;">${esc(err?.code || "")} ${esc(err?.message || err)}</p>
+          </div>
+        `;
+        return;
+      }
+
+      try {
         allStudents = [];
         snap.forEach((doc) => {
           const data = doc.data();
           if (data.email === PA.teacherEmail) return;
           const login = data.login || PA.getLoginFromEmail(data.email || "");
-          const parsed = PA.parseStudentLogin(login);
-          const stats = PA.computeRatingStats(data);
+          const parsed = safeParseLogin(login);
+          const stats = safeComputeStats(data);
           allStudents.push({ uid: doc.id, ...data, login, parsed, stats });
         });
 
@@ -461,11 +536,11 @@
 
         renderDashboard();
       } catch (err) {
-        console.error(err);
+        console.error("Dashboard render error:", err);
         root.innerHTML = `
           <div class="denied-box">
-            <h2>Ошибка чтения базы</h2>
-            <p>Проверьте правила Firestore (раздел Rules) и авторизацию учителя.</p>
+            <h2>Ошибка отображения панели</h2>
+            <p style="font-family:var(--mono); font-size:12px; color:#fda4af;">${esc(err?.message || err)}</p>
           </div>
         `;
       }
@@ -473,22 +548,15 @@
 
     function sortForRanking(list) {
       return [...list].sort((a, b) => {
-        if (b.stats.totalCorrect !== a.stats.totalCorrect) {
-          return b.stats.totalCorrect - a.stats.totalCorrect;
-        }
-        if (b.stats.firstTryCorrect !== a.stats.firstTryCorrect) {
-          return b.stats.firstTryCorrect - a.stats.firstTryCorrect;
-        }
-        if (a.stats.totalAttempts !== b.stats.totalAttempts) {
-          return a.stats.totalAttempts - b.stats.totalAttempts;
-        }
+        if (b.stats.totalCorrect !== a.stats.totalCorrect) return b.stats.totalCorrect - a.stats.totalCorrect;
+        if (b.stats.firstTryCorrect !== a.stats.firstTryCorrect) return b.stats.firstTryCorrect - a.stats.firstTryCorrect;
+        if (a.stats.totalAttempts !== b.stats.totalAttempts) return a.stats.totalAttempts - b.stats.totalAttempts;
         return formatStudentPrimaryName(a).localeCompare(formatStudentPrimaryName(b), "ru");
       });
     }
 
     function renderDashboard() {
       const root = document.getElementById("app-root");
-      const PA = window.PhysAuth;
 
       const groupsMap = new Map();
       allStudents.forEach((st) => {
@@ -499,7 +567,7 @@
         groupsMap.get(gKey).students.push(st);
       });
 
-      const orderedGroupKeys = PA.sortGroupKeys(Array.from(groupsMap.keys()));
+      const orderedGroupKeys = safeSortGroupKeys(Array.from(groupsMap.keys()));
       if (selectedGroup !== "ALL" && !groupsMap.has(selectedGroup)) {
         selectedGroup = "ALL";
       }
@@ -515,7 +583,6 @@
       });
       const avgPct = totalSolved ? Math.round((totalCorrect / totalSolved) * 100) : 0;
 
-      // Общий ТОП-3 среди ВСЕХ учеников
       const top3 = sortForRanking(allStudents.filter((st) => st.stats.totalCorrect > 0)).slice(0, 3);
       let top3Html = "";
       if (top3.length === 0) {
@@ -528,7 +595,7 @@
             const pct = st.stats.totalSolved
               ? Math.round((st.stats.totalCorrect / st.stats.totalSolved) * 100)
               : 0;
-            const badgeStyle = PA.getGroupBadgeStyleAttr(st.parsed.groupKey);
+            const badgeStyle = safeGetGroupBadgeStyleAttr(st.parsed.groupKey);
             const codeInfo = st.parsed.valid ? `${st.parsed.grade} кл · ${st.parsed.code}` : st.login;
 
             return `
@@ -553,14 +620,13 @@
           .join("") + `</div>`;
       }
 
-      // Вкладки фильтра по группам для таблицы ДЗ (каждая со своим цветом)
       const groupTabsHtml = [
         `<button class="group-tab ${selectedGroup === "ALL" ? "active" : ""}" style="${selectedGroup === "ALL" ? "background:rgba(99,102,241,0.22); border-color:rgba(99,102,241,0.55);" : ""}" data-group="ALL" type="button">
           Все группы <span class="tab-count">${allStudents.length}</span>
         </button>`,
         ...orderedGroupKeys.map((gKey) => {
           const g = groupsMap.get(gKey);
-          const c = PA.getGroupStyle(gKey);
+          const c = safeGetGroupStyle(gKey);
           const isActive = selectedGroup === gKey;
           const activeStyle = isActive ? `background:${c.bg}; border-color:${c.border}; color:${c.text};` : "";
           return `
@@ -590,7 +656,7 @@
       } else {
         rowsHtml = sortedTableStudents
           .map((st) => {
-            const badgeStyle = PA.getGroupBadgeStyleAttr(st.parsed.groupKey);
+            const badgeStyle = safeGetGroupBadgeStyleAttr(st.parsed.groupKey);
             const cells = DZ_LIST.map((dz) => {
               const tasks = st.dz?.[dz.key];
               if (!tasks || Object.keys(tasks).length === 0) {
@@ -790,7 +856,7 @@
         const st = allStudents.find((s) => s.uid === uid);
         if (st && st.dz) {
           delete st.dz[dzKey];
-          st.stats = PA.computeRatingStats(st);
+          st.stats = safeComputeStats(st);
           await PA.getDb().collection("ratings").doc(uid).set(st.stats, { merge: true }).catch(() => {});
         }
         closeDetailModal();
