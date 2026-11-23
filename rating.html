@@ -201,10 +201,38 @@
     <div id="my-summary-wrap"></div>
   </main>
 
-  <script src="auth.js"></script>
+  <script src="auth.js?v=4"></script>
   <script>
+    const FALLBACK_PALETTE = [
+      { bg: "rgba(56, 189, 248, 0.15)", border: "rgba(56, 189, 248, 0.38)", text: "#bae6fd" },
+      { bg: "rgba(16, 185, 129, 0.16)", border: "rgba(16, 185, 129, 0.40)", text: "#6ee7b7" },
+      { bg: "rgba(244, 63, 94, 0.16)", border: "rgba(244, 63, 94, 0.40)", text: "#fda4af" },
+      { bg: "rgba(99, 102, 241, 0.18)", border: "rgba(99, 102, 241, 0.44)", text: "#c7d2fe" },
+      { bg: "rgba(20, 184, 166, 0.16)", border: "rgba(20, 184, 166, 0.40)", text: "#99f6e4" },
+      { bg: "rgba(249, 115, 22, 0.16)", border: "rgba(249, 115, 22, 0.40)", text: "#fed7aa" },
+      { bg: "rgba(236, 72, 153, 0.16)", border: "rgba(236, 72, 153, 0.40)", text: "#fbcfe8" },
+      { bg: "rgba(132, 204, 22, 0.16)", border: "rgba(132, 204, 22, 0.40)", text: "#d9f99d" }
+    ];
+
     function esc(s) {
       return window.PhysAuth ? window.PhysAuth.escapeHtml(s) : String(s ?? "");
+    }
+
+    function safeGetGroupBadgeStyleAttr(groupKey) {
+      if (window.PhysAuth?.getGroupBadgeStyleAttr) return window.PhysAuth.getGroupBadgeStyleAttr(groupKey);
+      const key = String(groupKey || "UNKNOW").toUpperCase();
+      let c;
+      if (key === "UNKNOW") c = { bg: "rgba(245,158,11,0.16)", border: "rgba(245,158,11,0.40)", text: "#fde68a" };
+      else if (key === "IN") c = { bg: "rgba(168,85,247,0.17)", border: "rgba(168,85,247,0.42)", text: "#e9d5ff" };
+      else {
+        const num = parseInt(key, 10);
+        if (!isNaN(num) && num >= 1 && num <= FALLBACK_PALETTE.length) c = FALLBACK_PALETTE[num - 1];
+        else {
+          const hue = Math.round(((Math.max(1, num || 1) - 1) * 137.508) % 360);
+          c = { bg: `hsla(${hue},78%,55%,0.16)`, border: `hsla(${hue},78%,60%,0.40)`, text: `hsl(${hue},85%,82%)` };
+        }
+      }
+      return `background:${c.bg}; border-color:${c.border}; color:${c.text};`;
     }
 
     function formatName(entry) {
@@ -266,7 +294,7 @@
               const pos = idx + 1;
               const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : "🥉";
               const isMe = e.uid === user.uid;
-              const groupStyle = PA.getGroupBadgeStyleAttr(e.groupKey);
+              const groupStyle = safeGetGroupBadgeStyleAttr(e.groupKey);
               const gradeTxt = e.grade ? `${e.grade} класс` : "";
 
               return `
@@ -302,7 +330,6 @@
           `;
         }
 
-        // Личная строка только для самого ученика (без раскрытия остальных мест)
         if (!isTeacher) {
           const myIndex = activeRanked.findIndex((e) => e.uid === user.uid);
           if (myIndex >= 3) {
@@ -327,7 +354,7 @@
         }
       } catch (err) {
         console.error(err);
-        card.innerHTML = `<div class="empty-note">Не удалось загрузить рейтинг.</div>`;
+        card.innerHTML = `<div class="empty-note">Не удалось загрузить рейтинг: ${esc(err?.message || err)}</div>`;
       }
     }
 
