@@ -153,7 +153,7 @@
       padding: 2px 7px; border-radius: 999px;
       background: rgba(99, 102, 241, 0.25); color: #c7d2fe;
     }
-    .rank-sub { font-size: 12px; color: var(--text-muted); font-family: var(--mono); }
+    .rank-sub { font-size: 12px; color: var(--text-muted); }
     .rank-metrics { text-align: right; flex-shrink: 0; }
     .rank-score { font-family: var(--mono); font-weight: 800; font-size: 16px; color: #6ee7b7; }
     .rank-extra { font-size: 11px; color: var(--text-sub); font-family: var(--mono); }
@@ -192,11 +192,7 @@
     }
 
     function formatName(entry) {
-      if (entry.displayName) return entry.displayName;
-      if (entry.parsed?.valid) {
-        return `Ученик №${Number(entry.parsed.studentNum)} (${entry.parsed.code})`;
-      }
-      return entry.login || "Ученик";
+      return entry.displayName || "Участник";
     }
 
     function sortRanking(list) {
@@ -231,16 +227,16 @@
         allEntries = [];
         snap.forEach((doc) => {
           const d = doc.data();
-          if (d.email === PA.teacherEmail) return;
-          const login = d.login || "";
-          const parsed = PA.parseStudentLogin(login);
+          if (!d.groupKey) return;
           allEntries.push({
             uid: doc.id,
-            ...d,
-            login,
-            parsed,
-            groupKey: parsed.groupKey,
-            groupLabel: parsed.groupLabel
+            displayName: d.displayName || "",
+            groupKey: d.groupKey,
+            groupLabel: d.groupLabel || d.groupKey,
+            grade: d.grade || "",
+            totalCorrect: d.totalCorrect || 0,
+            firstTryCorrect: d.firstTryCorrect || 0,
+            totalAttempts: d.totalAttempts || 0
           });
         });
 
@@ -260,7 +256,7 @@
         renderGroupCard(user.uid);
       } catch (err) {
         console.error(err);
-        card.innerHTML = `<div class="empty-note">Не удалось загрузить рейтинг. Проверьте правила Firestore для коллекции <code>ratings</code>.</div>`;
+        card.innerHTML = `<div class="empty-note">Не удалось загрузить рейтинг.</div>`;
       }
     }
 
@@ -314,9 +310,9 @@
         .map((e, idx) => {
           const pos = idx + 1;
           const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : pos;
-          const topCls = pos <= 3 && (e.totalCorrect || 0) > 0 ? `top-${pos}` : "";
+          const topCls = pos <= 3 && e.totalCorrect > 0 ? `top-${pos}` : "";
           const isMe = e.uid === myUid;
-          const sub = e.parsed?.valid ? `${e.parsed.grade} кл · код ${e.parsed.code}` : e.login;
+          const sub = e.grade ? `${e.grade} класс` : "";
 
           return `
             <div class="rank-row ${topCls} ${isMe ? "is-me" : ""}">
@@ -327,12 +323,12 @@
                     ${esc(formatName(e))}
                     ${isMe ? `<span class="me-tag">Вы</span>` : ""}
                   </div>
-                  <div class="rank-sub">${esc(sub)}</div>
+                  ${sub ? `<div class="rank-sub">${esc(sub)}</div>` : ""}
                 </div>
               </div>
               <div class="rank-metrics">
-                <div class="rank-score">${e.totalCorrect || 0} верно</div>
-                <div class="rank-extra">с 1-й поп: ${e.firstTryCorrect || 0}</div>
+                <div class="rank-score">${e.totalCorrect} верно</div>
+                <div class="rank-extra">с 1-й поп: ${e.firstTryCorrect}</div>
               </div>
             </div>
           `;
