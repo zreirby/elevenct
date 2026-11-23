@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#090a10" />
-  <title>Рейтинг группы • Физика</title>
+  <title>ТОП-3 лучших • Физика</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -78,6 +78,19 @@
     main { max-width: 680px; margin: 0 auto; padding: 28px 16px 60px; }
 
     .hero { text-align: center; margin-bottom: 24px; }
+    .hero-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
     .hero h1 {
       font-size: 32px; font-weight: 800; letter-spacing: -0.02em;
       background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
@@ -85,24 +98,6 @@
       margin-bottom: 6px;
     }
     .hero p { color: var(--text-sub); font-size: 15px; }
-
-    .group-tabs { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
-    .group-tab {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      color: var(--text-sub);
-      padding: 8px 13px;
-      border-radius: 11px;
-      font-size: 13px;
-      font-weight: 700;
-      font-family: inherit;
-      cursor: pointer;
-    }
-    .group-tab.active {
-      background: rgba(99, 102, 241, 0.22);
-      border-color: rgba(99, 102, 241, 0.55);
-      color: #fff;
-    }
 
     .card {
       background: var(--surface-card);
@@ -117,18 +112,13 @@
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 16px; gap: 10px; flex-wrap: wrap;
     }
-    .group-pill {
-      font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
-      padding: 5px 12px; border-radius: 999px;
-      background: rgba(56, 189, 248, 0.14); border: 1px solid rgba(56, 189, 248, 0.3); color: #bae6fd;
-    }
-    .group-pill.gp-in { background: rgba(168, 85, 247, 0.16); border-color: rgba(168, 85, 247, 0.35); color: #e9d5ff; }
-    .group-pill.gp-unknow { background: rgba(245, 158, 11, 0.16); border-color: rgba(245, 158, 11, 0.35); color: #fde68a; }
+    .card-title { font-size: 15px; font-weight: 800; color: #fff; }
+    .card-sub { font-size: 12px; color: var(--text-sub); }
 
     .rank-list { display: flex; flex-direction: column; gap: 10px; }
     .rank-row {
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      padding: 13px 15px; border-radius: 16px;
+      padding: 14px 16px; border-radius: 16px;
       background: rgba(26, 32, 48, 0.8);
       border: 1px solid var(--border);
     }
@@ -136,27 +126,55 @@
       border-color: rgba(99, 102, 241, 0.65);
       box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.3), 0 10px 24px rgba(99, 102, 241, 0.18);
     }
-    .rank-row.top-1 { background: linear-gradient(90deg, rgba(250, 204, 21, 0.13), rgba(26, 32, 48, 0.85)); }
-    .rank-row.top-2 { background: linear-gradient(90deg, rgba(203, 213, 225, 0.11), rgba(26, 32, 48, 0.85)); }
-    .rank-row.top-3 { background: linear-gradient(90deg, rgba(251, 146, 60, 0.11), rgba(26, 32, 48, 0.85)); }
+    .rank-row.top-1 { background: linear-gradient(90deg, rgba(250, 204, 21, 0.14), rgba(26, 32, 48, 0.86)); border-color: rgba(250, 204, 21, 0.28); }
+    .rank-row.top-2 { background: linear-gradient(90deg, rgba(203, 213, 225, 0.12), rgba(26, 32, 48, 0.86)); border-color: rgba(203, 213, 225, 0.24); }
+    .rank-row.top-3 { background: linear-gradient(90deg, rgba(251, 146, 60, 0.12), rgba(26, 32, 48, 0.86)); border-color: rgba(251, 146, 60, 0.24); }
 
     .rank-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
     .rank-pos {
-      width: 36px; height: 36px; border-radius: 11px; flex-shrink: 0;
+      width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      font-family: var(--mono); font-weight: 800; font-size: 15px;
+      font-family: var(--mono); font-weight: 800; font-size: 18px;
       background: rgba(255, 255, 255, 0.07);
     }
-    .rank-name { font-weight: 700; font-size: 15px; color: #fff; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .rank-name { font-weight: 700; font-size: 16px; color: #fff; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
     .me-tag {
       font-size: 10px; font-weight: 800; text-transform: uppercase;
       padding: 2px 7px; border-radius: 999px;
       background: rgba(99, 102, 241, 0.25); color: #c7d2fe;
     }
+    .rank-meta-line {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px;
+    }
+    .group-pill {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 9px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
     .rank-sub { font-size: 12px; color: var(--text-muted); }
     .rank-metrics { text-align: right; flex-shrink: 0; }
     .rank-score { font-family: var(--mono); font-weight: 800; font-size: 16px; color: #6ee7b7; }
     .rank-extra { font-size: 11px; color: var(--text-sub); font-family: var(--mono); }
+
+    .my-summary {
+      margin-top: 14px;
+      padding: 13px 16px;
+      border-radius: 16px;
+      background: rgba(18, 22, 34, 0.65);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+    .my-summary strong { color: #fff; font-family: var(--mono); }
 
     .empty-note { text-align: center; color: var(--text-sub); padding: 24px 10px; font-size: 14px; }
   </style>
@@ -171,22 +189,20 @@
 
   <main>
     <div class="hero">
-      <h1>Рейтинг</h1>
-      <p id="hero-sub">Загрузка таблицы лидеров...</p>
+      <div class="hero-badge">Общий зачёт</div>
+      <h1>ТОП-3 лучших</h1>
+      <p id="hero-sub">Лидеры среди всех учеников</p>
     </div>
-
-    <div class="group-tabs" id="group-tabs" style="display:none"></div>
 
     <div class="card" id="rating-card">
       <div class="empty-note">Загружаем данные...</div>
     </div>
+
+    <div id="my-summary-wrap"></div>
   </main>
 
   <script src="auth.js"></script>
   <script>
-    let allEntries = [];
-    let activeGroupKey = null;
-
     function esc(s) {
       return window.PhysAuth ? window.PhysAuth.escapeHtml(s) : String(s ?? "");
     }
@@ -208,6 +224,7 @@
       const PA = window.PhysAuth;
       const card = document.getElementById("rating-card");
       const heroSub = document.getElementById("hero-sub");
+      const summaryWrap = document.getElementById("my-summary-wrap");
       if (!PA || !PA.getUser()) return;
 
       const user = PA.getUser();
@@ -216,15 +233,13 @@
       if (!isTeacher && !PA.showRatingToStudents) {
         heroSub.textContent = "Доступ ограничен";
         card.innerHTML = `<div class="empty-note">Рейтинг сейчас скрыт преподавателем.</div>`;
+        summaryWrap.innerHTML = "";
         return;
       }
 
-      const myLogin = PA.getLoginFromEmail(user.email);
-      const myParsed = PA.parseStudentLogin(myLogin);
-
       try {
         const snap = await PA.getDb().collection("ratings").get();
-        allEntries = [];
+        const allEntries = [];
         snap.forEach((doc) => {
           const d = doc.data();
           if (!d.groupKey) return;
@@ -232,7 +247,7 @@
             uid: doc.id,
             displayName: d.displayName || "",
             groupKey: d.groupKey,
-            groupLabel: d.groupLabel || d.groupKey,
+            groupLabel: d.groupLabel || (d.groupKey === "IN" ? "Индивидуально (IN)" : d.groupKey === "UNKNOW" ? "UNKNOW" : `Группа №${Number(d.groupKey)}`),
             grade: d.grade || "",
             totalCorrect: d.totalCorrect || 0,
             firstTryCorrect: d.firstTryCorrect || 0,
@@ -240,108 +255,80 @@
           });
         });
 
-        if (isTeacher) {
-          const keys = PA.sortGroupKeys(Array.from(new Set(allEntries.map((e) => e.groupKey))));
-          if (!activeGroupKey || !keys.includes(activeGroupKey)) {
-            activeGroupKey = keys[0] || "UNKNOW";
-          }
-          renderTeacherTabs(keys);
-          heroSub.textContent = "Рейтинг учеников по группам";
+        const activeRanked = sortRanking(allEntries.filter((e) => e.totalCorrect > 0));
+        const top3 = activeRanked.slice(0, 3);
+
+        if (top3.length === 0) {
+          card.innerHTML = `<div class="empty-note">Пока никто не решил ни одной задачи — станьте первым в ТОП-3!</div>`;
         } else {
-          document.getElementById("group-tabs").style.display = "none";
-          activeGroupKey = myParsed.groupKey;
-          heroSub.textContent = `Ваша группа: ${myParsed.groupLabel}`;
+          const rows = top3
+            .map((e, idx) => {
+              const pos = idx + 1;
+              const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : "🥉";
+              const isMe = e.uid === user.uid;
+              const groupStyle = PA.getGroupBadgeStyleAttr(e.groupKey);
+              const gradeTxt = e.grade ? `${e.grade} класс` : "";
+
+              return `
+                <div class="rank-row top-${pos} ${isMe ? "is-me" : ""}">
+                  <div class="rank-left">
+                    <div class="rank-pos">${medal}</div>
+                    <div style="min-width:0">
+                      <div class="rank-name">
+                        ${esc(formatName(e))}
+                        ${isMe ? `<span class="me-tag">Вы</span>` : ""}
+                      </div>
+                      <div class="rank-meta-line">
+                        <span class="group-pill" style="${groupStyle}">${esc(e.groupLabel)}</span>
+                        ${gradeTxt ? `<span class="rank-sub">${esc(gradeTxt)}</span>` : ""}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="rank-metrics">
+                    <div class="rank-score">${e.totalCorrect} верно</div>
+                    <div class="rank-extra">с 1-й поп: ${e.firstTryCorrect}</div>
+                  </div>
+                </div>
+              `;
+            })
+            .join("");
+
+          card.innerHTML = `
+            <div class="card-head">
+              <span class="card-title">Лидеры курса</span>
+              <span class="card-sub">Всего участников: ${allEntries.length}</span>
+            </div>
+            <div class="rank-list">${rows}</div>
+          `;
         }
 
-        renderGroupCard(user.uid);
+        // Личная строка только для самого ученика (без раскрытия остальных мест)
+        if (!isTeacher) {
+          const myIndex = activeRanked.findIndex((e) => e.uid === user.uid);
+          if (myIndex >= 3) {
+            const me = activeRanked[myIndex];
+            summaryWrap.innerHTML = `
+              <div class="my-summary">
+                <span>Ваш личный результат в общем зачёте:</span>
+                <span><strong>#${myIndex + 1}</strong> из ${activeRanked.length} · <strong>${me.totalCorrect}</strong> верно</span>
+              </div>
+            `;
+          } else if (myIndex === -1) {
+            summaryWrap.innerHTML = `
+              <div class="my-summary">
+                <span>Решите первую задачу верно, чтобы попасть в общий зачёт!</span>
+              </div>
+            `;
+          } else {
+            summaryWrap.innerHTML = "";
+          }
+        } else {
+          summaryWrap.innerHTML = "";
+        }
       } catch (err) {
         console.error(err);
         card.innerHTML = `<div class="empty-note">Не удалось загрузить рейтинг.</div>`;
       }
-    }
-
-    function renderTeacherTabs(keys) {
-      const tabsEl = document.getElementById("group-tabs");
-      if (keys.length === 0) {
-        tabsEl.style.display = "none";
-        return;
-      }
-      tabsEl.style.display = "flex";
-      tabsEl.innerHTML = keys
-        .map((k) => {
-          const label = k === "IN" ? "Индивидуально (IN)" : k === "UNKNOW" ? "UNKNOW" : `Группа №${Number(k)}`;
-          return `<button class="group-tab ${k === activeGroupKey ? "active" : ""}" data-g="${esc(k)}" type="button">${esc(label)}</button>`;
-        })
-        .join("");
-
-      tabsEl.querySelectorAll(".group-tab").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          activeGroupKey = btn.dataset.g;
-          renderTeacherTabs(keys);
-          renderGroupCard(window.PhysAuth.getUser().uid);
-        });
-      });
-    }
-
-    function renderGroupCard(myUid) {
-      const card = document.getElementById("rating-card");
-      const groupList = sortRanking(allEntries.filter((e) => e.groupKey === activeGroupKey));
-
-      const label =
-        activeGroupKey === "IN"
-          ? "Индивидуально (IN)"
-          : activeGroupKey === "UNKNOW"
-          ? "UNKNOW"
-          : `Группа №${Number(activeGroupKey)}`;
-      const pillCls =
-        activeGroupKey === "IN" ? "group-pill gp-in" : activeGroupKey === "UNKNOW" ? "group-pill gp-unknow" : "group-pill";
-
-      if (groupList.length === 0) {
-        card.innerHTML = `
-          <div class="card-head">
-            <span class="${pillCls}">${esc(label)}</span>
-          </div>
-          <div class="empty-note">В этой группе пока нет участников с решёнными задачами.</div>
-        `;
-        return;
-      }
-
-      const rows = groupList
-        .map((e, idx) => {
-          const pos = idx + 1;
-          const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : pos;
-          const topCls = pos <= 3 && e.totalCorrect > 0 ? `top-${pos}` : "";
-          const isMe = e.uid === myUid;
-          const sub = e.grade ? `${e.grade} класс` : "";
-
-          return `
-            <div class="rank-row ${topCls} ${isMe ? "is-me" : ""}">
-              <div class="rank-left">
-                <div class="rank-pos">${medal}</div>
-                <div style="min-width:0">
-                  <div class="rank-name">
-                    ${esc(formatName(e))}
-                    ${isMe ? `<span class="me-tag">Вы</span>` : ""}
-                  </div>
-                  ${sub ? `<div class="rank-sub">${esc(sub)}</div>` : ""}
-                </div>
-              </div>
-              <div class="rank-metrics">
-                <div class="rank-score">${e.totalCorrect} верно</div>
-                <div class="rank-extra">с 1-й поп: ${e.firstTryCorrect}</div>
-              </div>
-            </div>
-          `;
-        })
-        .join("");
-
-      card.innerHTML = `
-        <div class="card-head">
-          <span class="${pillCls}">${esc(label)}</span>
-          <span style="font-size:12px; color:var(--text-sub);">${groupList.length} уч.</span>
-        </div>
-        <div class="rank-list">${rows}</div>
-      `;
     }
 
     document.getElementById("btn-logout").addEventListener("click", () => {
