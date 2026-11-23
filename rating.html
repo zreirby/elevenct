@@ -144,7 +144,7 @@
       background: rgba(99, 102, 241, 0.25); color: #c7d2fe;
     }
     .rank-meta-line {
-      display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 5px;
     }
     .group-pill {
       display: inline-block;
@@ -155,10 +155,9 @@
       border: 1px solid transparent;
       white-space: nowrap;
     }
-    .rank-sub { font-size: 12px; color: var(--text-muted); }
     .rank-metrics { text-align: right; flex-shrink: 0; }
-    .rank-score { font-family: var(--mono); font-weight: 800; font-size: 16px; color: #6ee7b7; }
-    .rank-extra { font-size: 11px; color: var(--text-sub); font-family: var(--mono); }
+    .rank-score { font-family: var(--mono); font-weight: 800; font-size: 16px; color: #6ee7b7; white-space: nowrap; }
+    .rank-extra { font-size: 11px; color: var(--text-sub); font-family: var(--mono); white-space: nowrap; }
 
     .my-summary {
       margin-top: 14px;
@@ -276,7 +275,6 @@
             displayName: d.displayName || "",
             groupKey: d.groupKey,
             groupLabel: d.groupLabel || (d.groupKey === "IN" ? "Индивидуально (IN)" : d.groupKey === "UNKNOW" ? "UNKNOW" : `Группа №${Number(d.groupKey)}`),
-            grade: d.grade || "",
             totalCorrect: d.totalCorrect || 0,
             firstTryCorrect: d.firstTryCorrect || 0,
             totalAttempts: d.totalAttempts || 0
@@ -295,7 +293,6 @@
               const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : "🥉";
               const isMe = e.uid === user.uid;
               const groupStyle = safeGetGroupBadgeStyleAttr(e.groupKey);
-              const gradeTxt = e.grade ? `${e.grade} класс` : "";
 
               return `
                 <div class="rank-row top-${pos} ${isMe ? "is-me" : ""}">
@@ -308,13 +305,12 @@
                       </div>
                       <div class="rank-meta-line">
                         <span class="group-pill" style="${groupStyle}">${esc(e.groupLabel)}</span>
-                        ${gradeTxt ? `<span class="rank-sub">${esc(gradeTxt)}</span>` : ""}
                       </div>
                     </div>
                   </div>
                   <div class="rank-metrics">
                     <div class="rank-score">${e.totalCorrect} верно</div>
-                    <div class="rank-extra">с 1-й поп: ${e.firstTryCorrect}</div>
+                    <div class="rank-extra">с 1 попытки: ${e.firstTryCorrect}</div>
                   </div>
                 </div>
               `;
